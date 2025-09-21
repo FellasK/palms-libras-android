@@ -1,81 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="32dp"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".activities.AuthActivity">
+
+    <ImageView
+        android:id="@+id/backgroundWave"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/background_purple"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.3" />
+
+    <ImageView
+        android:id="@+id/logoIcon"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:contentDescription="@null"
+        app:srcCompat="@drawable/ic_logo_palms"
+        app:layout_constraintBottom_toBottomOf="@id/backgroundWave"
+        app:layout_constraintTop_toTopOf="@id/backgroundWave"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/logoText"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
 
     <TextView
+        android:id="@+id/logoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PALMS LIBRAS"
-        android:textColor="@color/primary_purple"
+        android:layout_marginStart="16dp"
+        android:contentDescription="@string/cd_app_logo"
+        android:fontFamily="@font/open_sans_bold"
+        android:text="@string/app_name"
+        android:textColor="@color/white"
         android:textSize="34sp"
         android:textStyle="bold"
-        android:layout_marginTop="64dp"
-        android:layout_marginBottom="16dp"/>
+        app:layout_constraintBottom_toBottomOf="@id/logoIcon"
+        app:layout_constraintTop_toTopOf="@id/logoIcon"
+        app:layout_constraintStart_toEndOf="@id/logoIcon"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <TextView
+        android:id="@+id/subtitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crie sua conta e comece a aprender"
-        android:textColor="@color/gray_text"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/open_sans"
+        android:text="@string/login_subtitle"
         android:textAlignment="center"
+        android:textColor="@color/gray_text"
         android:textSize="18sp"
-        android:layout_marginBottom="48dp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backgroundWave" />
 
-    <EditText
-        android:id="@+id/nameEditText"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="Nome (apenas para cadastro)"
-        android:background="@drawable/edittext_background"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:layout_marginBottom="16dp"/>
+    <LinearLayout
+        android:id="@+id/formContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subtitleText">
 
-    <EditText
-        android:id="@+id/emailEditText"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:background="@drawable/edittext_background"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:layout_marginBottom="16dp"/>
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:autofillHints="name"
+            android:background="@drawable/edittext_background"
+            android:hint="@string/hint_name"
+            android:inputType="textPersonName"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp" />
 
-    <EditText
-        android:id="@+id/passwordEditText"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="Senha"
-        android:inputType="textPassword"
-        android:background="@drawable/edittext_background"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:layout_marginBottom="24dp"/>
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:autofillHints="emailAddress"
+            android:background="@drawable/edittext_background"
+            android:hint="@string/hint_email"
+            android:inputType="textEmailAddress"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp" />
+
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="24dp"
+            android:autofillHints="password"
+            android:background="@drawable/edittext_background"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp" />
+
+    </LinearLayout>
 
     <Button
-        android:id="@+id/registerButton"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Criar Conta"
+        android:id="@+id/mainActionButton"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/button_primary_background"
+        android:fontFamily="@font/open_sans_bold"
+        android:textColor="@color/white"
+        android:textSize="22sp"
         app:backgroundTint="@null"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/white"/>
+        app:layout_constraintTop_toBottomOf="@id/formContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Ação Principal"/>
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/secondaryAuthButton"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Já tenho uma conta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
         android:textColor="@color/primary_purple"
-        android:textAllCaps="false"/>
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainActionButton"
+        app:layout_constraintVertical_bias="0.2"
+        tools:text="Ação Secundária"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

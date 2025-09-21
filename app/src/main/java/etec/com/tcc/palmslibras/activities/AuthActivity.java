@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,10 +19,11 @@ import etec.com.tcc.palmslibras.utils.SessionManager;
 public class AuthActivity extends AppCompatActivity {
 
     private EditText nameEditText, emailEditText, passwordEditText;
-    private Button loginButton, registerButton;
+    private Button mainActionButton, secondaryAuthButton;
+    private TextView subtitleText; // Adicionado para mudar o subtítulo
     private DatabaseHelper dbHelper;
     private SessionManager sessionManager;
-    private boolean isLoginView = true; // Controla se a tela está em modo login ou cadastro
+    private boolean isLoginView = true; // Começa na tela de login
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,43 +33,49 @@ public class AuthActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
         sessionManager = new SessionManager(this);
 
+        // IDs atualizados para maior clareza
         nameEditText = findViewById(R.id.nameEditText);
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
-        loginButton = findViewById(R.id.loginButton);
-        registerButton = findViewById(R.id.registerButton);
+        mainActionButton = findViewById(R.id.mainActionButton);
+        secondaryAuthButton = findViewById(R.id.secondaryAuthButton);
+        subtitleText = findViewById(R.id.subtitleText);
 
-        // Inicialmente, a tela é de cadastro, mas o botão principal é "Criar Conta"
+        // Configura a UI inicial para o modo de login
         updateUIForViewMode();
 
-        registerButton.setOnClickListener(v -> {
-            if (isLoginView) { // Se está em modo login, o botão secundário vira "Criar Conta"
-                isLoginView = false;
-                updateUIForViewMode();
-            } else { // Se está em modo cadastro, executa o registro
+        // Listener do botão principal (Roxo)
+        mainActionButton.setOnClickListener(v -> {
+            if (isLoginView) {
+                // Se está na tela de login, executa o login
+                loginUser();
+            } else {
+                // Se está na tela de cadastro, executa o cadastro
                 registerUser();
             }
         });
 
-        loginButton.setOnClickListener(v -> {
-            if(isLoginView){ // Se está em modo login, executa o login
-                loginUser();
-            } else { // Se está em modo cadastro, o botão principal vira o de login
-                isLoginView = true;
-                updateUIForViewMode();
-            }
+        // Listener do botão secundário (Link de texto)
+        secondaryAuthButton.setOnClickListener(v -> {
+            // A única função deste botão é alternar a visualização
+            isLoginView = !isLoginView; // Inverte o modo (true vira false, false vira true)
+            updateUIForViewMode();
         });
     }
 
     private void updateUIForViewMode() {
         if (isLoginView) {
+            // --- MODO LOGIN ---
+            subtitleText.setText(getString(R.string.login_subtitle));
             nameEditText.setVisibility(View.GONE);
-            loginButton.setText("Entrar");
-            registerButton.setText("Criar uma conta");
+            mainActionButton.setText(getString(R.string.button_login));
+            secondaryAuthButton.setText(getString(R.string.button_create_new_account));
         } else {
+            // --- MODO CADASTRO ---
+            subtitleText.setText(getString(R.string.signup_subtitle));
             nameEditText.setVisibility(View.VISIBLE);
-            loginButton.setText("Já tenho uma conta");
-            registerButton.setText("Criar Conta");
+            mainActionButton.setText(getString(R.string.button_create_account));
+            secondaryAuthButton.setText(getString(R.string.button_already_have_account));
         }
     }
 

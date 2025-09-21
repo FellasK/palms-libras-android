@@ -1,27 +1,56 @@
 package etec.com.tcc.palmslibras.models;
 
-public class Activity {
-    private long id;
-    private int lessonId;
-    private String question;
-    private String optionsJson; // Opções armazenadas como uma string JSON: "[\"A\",\"B\",\"C\"]"
-    private String correctAnswer;
-    private int xpReward;
+import java.util.List;
 
-    public Activity(long id, int lessonId, String question, String optionsJson, String correctAnswer, int xpReward) {
-        this.id = id;
-        this.lessonId = lessonId;
-        this.question = question;
-        this.optionsJson = optionsJson;
-        this.correctAnswer = correctAnswer;
-        this.xpReward = xpReward;
+public class Activity {
+    private String title;
+    private String videoUrl;
+    private String question;
+    private List<String> options;
+    private String correctAnswer;
+
+    public Activity(long aLong, int anInt, String string, String string1, String string2, int anInt1) {
     }
 
-    // Getters
-    public long getId() { return id; }
-    public int getLessonId() { return lessonId; }
-    public String getQuestion() { return question; }
-    public String getOptionsJson() { return optionsJson; }
-    public String getCorrectAnswer() { return correctAnswer; }
-    public int getXpReward() { return xpReward; }
+    // Getters e Setters
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<String> options) {
+        this.options = options;
+    }
+
+    public String getCorrectAnswer() {
+        return correctAnswer;
+    }
+
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
+    }
 }

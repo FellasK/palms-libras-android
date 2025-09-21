@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/open_sans_bold"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Qual o sinal para a letra 'A'?" />
+
+    <GridLayout
+        android:id="@+id/optionsGrid"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:columnCount="2"
+        android:rowCount="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvQuestion">
+
+        <ImageView
+            android:id="@+id/ivOptionA"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:background="@drawable/choice_default_background"
+            android:padding="2dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_placeholder_gesture" />
+
+        <ImageView
+            android:id="@+id/ivOptionB"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:background="@drawable/choice_default_background"
+            android:padding="2dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_logo_palms" />
+
+        <ImageView
+            android:id="@+id/ivOptionC"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:background="@drawable/choice_default_background"
+            android:padding="2dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/background_purple" />
+
+        <ImageView
+            android:id="@+id/ivOptionD"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:background="@drawable/choice_default_background"
+            android:padding="2dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_abc_placeholder" />
+
+    </GridLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,3 +1,44 @@
 <resources>
-    <string name="app_name">Palms Libras</string>
+    <string name="app_name">PalmsLibras</string>
+
+    <string name="cd_app_logo">PALMS LIBRAS</string>
+
+    <string name="signup_subtitle">Crie sua conta e comece a\naprender com a palma da sua mão</string>
+    <string name="login_subtitle">Entre na sua conta e comece a\naprender com a palma da sua mão</string>
+
+    <string name="hint_name">Nome</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Senha</string>
+
+    <string name="button_login">Entrar</string>
+    <string name="button_create_account">Criar conta</string>
+    <string name="button_already_have_account">Já tenho uma conta</string>
+    <string name="button_create_new_account">Criar uma conta</string>
+
+    <string name="continue_button">Continuar</string>
+
+    <string name="close_button_description">Fechar atividade</string>
+    <string name="lives_icon_description">Ícone de vidas</string>
+    <string name="feedback_correct">Excelente!</string>
+    <string name="feedback_incorrect">Resposta Incorreta</string>
+    <string name="no_more_lives_toast">Você ficou sem vidas!</string>
+
+    <string name="qa_question_template">Qual o sinal para a letra \'%1$s\'?</string>
+    <string name="qa_option_image_description">Opção com o gesto da letra %1$s</string>
+
+    <string name="memory_game_title">Combine os pares</string>
+    <string name="memory_card_image_description">Card com o gesto da letra %1$s</string>
+    <string name="memory_card_text_description">Card com o texto da letra %1$s</string>
+
+    <string name="results_title">Unidade Concluída!</string>
+    <string name="results_total_xp">XP Total</string>
+    <string name="results_accuracy">Precisão</string>
+    <string name="results_xp_format">+%1$d</string>
+    <string name="results_accuracy_format">%1$.0f%%</string>
+
+    <string name="combine_pairs_title">Combine os Pares</string>
+    <string name="exit_button_desc">Sair do Jogo</string>
+
+    <string name="hello_blank_fragment">Olá, fragmento em branco</string>
+
 </resources>

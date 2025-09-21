@@ -35,7 +35,7 @@
             android:theme="@style/Theme.PalmsLibras.NoActionBar" />
 
         <activity
-            android:name=".activities.LessonActivity"
+            android:name=".activities.UnitActivity"
             android:exported="false"
             android:theme="@style/Theme.PalmsLibras.NoActionBar" />
 

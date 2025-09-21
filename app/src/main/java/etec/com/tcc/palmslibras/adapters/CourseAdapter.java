@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import etec.com.tcc.palmslibras.R;
-import etec.com.tcc.palmslibras.activities.LessonActivity;
+import etec.com.tcc.palmslibras.activities.UnitActivity;
 import etec.com.tcc.palmslibras.models.Course;
 
 public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseViewHolder> {
@@ -38,7 +38,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         holder.description.setText(course.getDescription());
 
         holder.continueButton.setOnClickListener(v -> {
-            Intent intent = new Intent(context, LessonActivity.class);
+            Intent intent = new Intent(context, UnitActivity.class);
             intent.putExtra("LESSON_ID", course.getLessonId());
             context.startActivity(intent);
         });
