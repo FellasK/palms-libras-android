@@ -28,11 +28,14 @@
     <color name="choice_correct_background">#e0d9ff</color>
     <color name="choice_incorrect_background">#ffa5a5</color>
     <color name="choice_border_color">#E0E0E0</color>
-    <color name="progress_bar_background">#f2efeb</color>
 
     <color name="memory_card_default">#e0e0e0</color>
     <color name="memory_card_selected">#91d7ff</color>
     <color name="memory_card_matched">#b5acff</color>
+    <color name="card_back_color">#E0E0E0</color>
+    <color name="card_matched_color">#B5ACFF</color>
+    <color name="card_selected_color">#91D7FF</color>
+    <color name="card_front_default_color">#E6E0F8</color>
 
     <color name="gray_background">#F5F5F5</color>
     <color name="gray_light">#E0E0E0</color>
@@ -40,6 +43,9 @@
     <color name="border_color_light">#9E9E9E</color>
     <color name="gray_text">#757575</color>
     <color name="gray_dark">#212121</color>
+
+    <color name="progress_bar_background">#f2efeb</color>
+    <color name="progress_bar_progress">#735cdd</color>
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

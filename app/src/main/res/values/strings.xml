@@ -20,15 +20,15 @@
     <string name="close_button_description">Fechar atividade</string>
     <string name="lives_icon_description">Ícone de vidas</string>
     <string name="feedback_correct">Excelente!</string>
+    <string name="feedback_correct_xp">Correto! +%1$d XP</string>
     <string name="feedback_incorrect">Resposta Incorreta</string>
     <string name="no_more_lives_toast">Você ficou sem vidas!</string>
 
     <string name="qa_question_template">Qual o sinal para a letra \'%1$s\'?</string>
     <string name="qa_option_image_description">Opção com o gesto da letra %1$s</string>
 
-    <string name="memory_game_title">Combine os pares</string>
-    <string name="memory_card_image_description">Card com o gesto da letra %1$s</string>
-    <string name="memory_card_text_description">Card com o texto da letra %1$s</string>
+    <string name="memory_game_title_detailed">Encontre os pares de palavras e seus gestos:</string>
+    <string name="memory_pairs_found_template">Pares encontrados %1$d/%2$d</string>
 
     <string name="results_title">Unidade Concluída!</string>
     <string name="results_total_xp">XP Total</string>

@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView; // Importação adicionada
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +34,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
     private Lesson lessonData;
     private RecyclerView memoryGrid;
     private MemoryCardAdapter adapter;
+    private TextView tvPairsCounter; // View para o contador
 
     private List<MemoryCard> cards = new ArrayList<>();
     private Integer firstSelectedIndex = null;
@@ -58,7 +60,10 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
             lessonData = (Lesson) getArguments().getSerializable("lesson_data");
         }
 
+        // Inicializa as views do novo layout
         memoryGrid = view.findViewById(R.id.memoryGrid);
+        tvPairsCounter = view.findViewById(R.id.tvPairsCounter);
+
         setupMemoryGame();
         return view;
     }
@@ -71,8 +76,18 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
         Collections.shuffle(cards);
 
         adapter = new MemoryCardAdapter(getContext(), cards, this);
-        memoryGrid.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        // Altera o número de colunas para 4
+        memoryGrid.setLayoutManager(new GridLayoutManager(getContext(), 4));
         memoryGrid.setAdapter(adapter);
+
+        // Inicia o contador
+        updatePairsCounter();
+    }
+
+    // Novo método para atualizar o texto do contador
+    private void updatePairsCounter() {
+        int totalPairs = lessonData.getMemoryPairs().size();
+        tvPairsCounter.setText(getString(R.string.memory_pairs_found_template, matchedPairs, totalPairs));
     }
 
     @Override
@@ -86,12 +101,12 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
         if (firstSelectedIndex == null) {
             firstSelectedIndex = position;
             adapter.setSelectedPosition(position);
-            adapter.notifyItemChanged(position); // Atualiza para mostrar borda azul
+            adapter.notifyItemChanged(position);
         } else {
             isChecking = true;
-            adapter.setSelectedPosition(RecyclerView.NO_POSITION); // Limpa seleção
-            adapter.notifyItemChanged(firstSelectedIndex); // Remove borda azul da anterior
-            adapter.notifyItemChanged(position); // Apenas vira, sem borda azul
+            adapter.setSelectedPosition(RecyclerView.NO_POSITION);
+            adapter.notifyItemChanged(firstSelectedIndex);
+            // Não precisa notificar o segundo item, pois a checagem já vai acontecer
 
             checkForMatch(firstSelectedIndex, position);
             firstSelectedIndex = null;
@@ -99,6 +114,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
     }
 
     private void flipCard(int position) {
+        // A lógica de flipCard permanece a mesma
         MemoryCard card = cards.get(position);
         card.setFlipped(!card.isFlipped());
 
@@ -138,6 +154,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
             firstCard.setMatched(true);
             secondCard.setMatched(true);
             matchedPairs++;
+            updatePairsCounter(); // Atualiza o contador
 
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 adapter.notifyItemChanged(firstPos);
@@ -146,7 +163,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
                 if (matchedPairs == lessonData.getMemoryPairs().size()) {
                     new Handler(Looper.getMainLooper()).postDelayed(() -> listener.onLessonCompleted(true), 800);
                 }
-            }, 300); // Pequeno delay para a animação terminar antes de mudar a cor
+            }, 300);
         } else {
             // Não deu Match
             new Handler(Looper.getMainLooper()).postDelayed(() -> {

@@ -2,9 +2,11 @@ package etec.com.tcc.palmslibras.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,17 +32,20 @@ import etec.com.tcc.palmslibras.utils.OnLessonCompleteListener;
 public class UnitActivity extends AppCompatActivity implements OnLessonCompleteListener {
 
     private ProgressBar progressBar;
-    private TextView tvLives;
     private LinearLayout feedbackContainer;
     private TextView tvFeedback;
-    private Button btnContinue;
     private ImageButton closeButton;
+    private List<ImageView> hearts = new ArrayList<>();
 
     private List<Lesson> lessonQueue = new ArrayList<>();
     private int currentLessonIndex = 0;
-    private int lives = 3;
+    private int lives = 5;
+    private final int MAX_LIVES = 5;
     private int xpGained = 0;
     private int correctAnswers = 0;
+
+    // Handler para agendar a próxima lição
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,22 +55,39 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         GestureManager.loadGestures(getApplicationContext());
 
         initializeViews();
+        updateLivesDisplay();
         loadUnitLessons();
         loadCurrentLesson();
     }
 
     private void initializeViews() {
         progressBar = findViewById(R.id.progressBar);
-        tvLives = findViewById(R.id.tvLives);
         feedbackContainer = findViewById(R.id.feedbackContainer);
         tvFeedback = findViewById(R.id.tvFeedback);
-        btnContinue = findViewById(R.id.btnContinue);
         closeButton = findViewById(R.id.closeButton);
 
-        tvLives.setText(String.valueOf(lives));
+        hearts.add(findViewById(R.id.heart1));
+        hearts.add(findViewById(R.id.heart2));
+        hearts.add(findViewById(R.id.heart3));
+        hearts.add(findViewById(R.id.heart4));
+        hearts.add(findViewById(R.id.heart5));
+
         closeButton.setOnClickListener(v -> finish());
-        btnContinue.setOnClickListener(v -> proceedToNextLesson());
+        // A linha abaixo foi removida para desativar o clique no feedback
+        // feedbackContainer.setOnClickListener(v -> proceedToNextLesson());
     }
+
+    private void updateLivesDisplay() {
+        for (int i = 0; i < MAX_LIVES; i++) {
+            if (i < lives) {
+                hearts.get(i).setVisibility(View.VISIBLE);
+            } else {
+                // Usar GONE em vez de INVISIBLE para não ocupar espaço
+                hearts.get(i).setVisibility(View.GONE);
+            }
+        }
+    }
+
 
     private void loadUnitLessons() {
         List<Gesture> unitGestures = GestureManager.getGesturesForUnit(1);
@@ -126,32 +148,44 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
             showFeedback(true);
         } else {
             lives--;
-            tvLives.setText(String.valueOf(lives));
+            updateLivesDisplay();
             showFeedback(false);
-            if (lives <= 0) {
-                Toast.makeText(this, getString(R.string.no_more_lives_toast), Toast.LENGTH_LONG).show();
-                finish();
-            }
+            // A verificação de "sem vidas" foi movida para proceedToNextLesson
+            // para que o feedback de erro seja exibido antes de a atividade terminar.
         }
     }
 
     private void showFeedback(boolean isCorrect) {
         feedbackContainer.setVisibility(View.VISIBLE);
         if (isCorrect) {
-            feedbackContainer.setBackgroundColor(ContextCompat.getColor(this, R.color.feedback_correct_background));
-            tvFeedback.setText(R.string.feedback_correct);
-            btnContinue.setTextColor(ContextCompat.getColor(this, R.color.feedback_correct_background));
+            feedbackContainer.setBackgroundResource(R.drawable.button_primary_background);
+            tvFeedback.setText(getString(R.string.feedback_correct_xp, 10));
         } else {
-            feedbackContainer.setBackgroundColor(ContextCompat.getColor(this, R.color.feedback_incorrect_background));
+            feedbackContainer.setBackgroundResource(R.drawable.button_incorrect_background);
             tvFeedback.setText(R.string.feedback_incorrect);
-            btnContinue.setTextColor(ContextCompat.getColor(this, R.color.feedback_incorrect_background));
         }
+
+        // Agenda a chamada para a próxima lição após 3 segundos
+        handler.postDelayed(() -> {
+            if (!isFinishing()) { // Garante que a atividade ainda está ativa
+                proceedToNextLesson();
+            }
+        }, 3000);
     }
 
     private void proceedToNextLesson(){
+        // Esconde o feedback antes de carregar a próxima lição
+        feedbackContainer.setVisibility(View.GONE);
+
+        // Verifica se o jogador ainda tem vidas
+        if (lives <= 0) {
+            Toast.makeText(this, getString(R.string.no_more_lives_toast), Toast.LENGTH_LONG).show();
+            finish();
+            return; // Interrompe a execução para não carregar a próxima lição
+        }
+
         currentLessonIndex++;
         progressBar.setProgress(currentLessonIndex);
-        feedbackContainer.setVisibility(View.GONE);
         loadCurrentLesson();
     }
 
@@ -162,5 +196,12 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         intent.putExtra("CORRECT_ANSWERS", correctAnswers);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remove quaisquer callbacks pendentes para evitar memory leaks
+        handler.removeCallbacksAndMessages(null);
     }
 }

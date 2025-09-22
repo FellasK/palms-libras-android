@@ -12,72 +12,137 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/open_sans_bold"
         android:textColor="@color/black"
-        android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Qual o sinal para a letra 'A'?" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Qual é a forma correta de fazer 'X' em libras?" />
 
-    <GridLayout
-        android:id="@+id/optionsGrid"
+    <LinearLayout
+        android:id="@+id/optionsContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
-        android:columnCount="2"
-        android:rowCount="2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvQuestion"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvQuestion">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <ImageView
-            android:id="@+id/ivOptionA"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="8dp"
+        <LinearLayout
+            android:id="@+id/optionA"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/choice_default_background"
-            android:padding="2dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_placeholder_gesture" />
+            android:gravity="center_vertical"
+            android:minHeight="64dp"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true">
 
-        <ImageView
-            android:id="@+id/ivOptionB"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="8dp"
+            <RadioButton
+                android:id="@+id/rbOptionA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:buttonTint="@color/primary_purple"
+                android:clickable="false" />
+
+            <ImageView
+                android:id="@+id/ivOptionA"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_placeholder_gesture" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/optionB"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/choice_default_background"
-            android:padding="2dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_logo_palms" />
+            android:gravity="center_vertical"
+            android:minHeight="64dp"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true">
 
-        <ImageView
-            android:id="@+id/ivOptionC"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="8dp"
+            <RadioButton
+                android:id="@+id/rbOptionB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:buttonTint="@color/primary_purple"
+                android:clickable="false"/>
+
+            <ImageView
+                android:id="@+id/ivOptionB"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_placeholder_gesture" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/optionC"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/choice_default_background"
-            android:padding="2dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/background_purple" />
+            android:gravity="center_vertical"
+            android:minHeight="64dp"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true">
 
-        <ImageView
-            android:id="@+id/ivOptionD"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="8dp"
+            <RadioButton
+                android:id="@+id/rbOptionC"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:buttonTint="@color/primary_purple"
+                android:clickable="false"/>
+
+            <ImageView
+                android:id="@+id/ivOptionC"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_placeholder_gesture" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/optionD"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/choice_default_background"
-            android:padding="2dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_abc_placeholder" />
+            android:gravity="center_vertical"
+            android:minHeight="64dp"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true">
 
-    </GridLayout>
+            <RadioButton
+                android:id="@+id/rbOptionD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:buttonTint="@color/primary_purple"
+                android:clickable="false"/>
 
+            <ImageView
+                android:id="@+id/ivOptionD"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_placeholder_gesture" />
+        </LinearLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

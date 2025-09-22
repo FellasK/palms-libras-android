@@ -5,11 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
+
 import java.util.List;
 import etec.com.tcc.palmslibras.R;
 import etec.com.tcc.palmslibras.models.MemoryCard;
@@ -20,9 +22,9 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
         void onCardClick(int position);
     }
 
-    private List<MemoryCard> cardList;
-    private OnCardClickListener listener;
-    private Context context;
+    private final List<MemoryCard> cardList;
+    private final OnCardClickListener listener;
+    private final Context context;
     private int selectedPosition = RecyclerView.NO_POSITION;
 
 
@@ -56,15 +58,14 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
 
     class CardViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardFront, cardBack;
-        LinearLayout cardFrontContent;
         ImageView ivMemoryImage;
         TextView tvMemoryText;
 
         CardViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Assumindo que os IDs no seu item_memory_card.xml são estes
             cardFront = itemView.findViewById(R.id.card_front);
             cardBack = itemView.findViewById(R.id.card_back);
-            cardFrontContent = itemView.findViewById(R.id.card_front_content);
             ivMemoryImage = itemView.findViewById(R.id.ivMemoryImage);
             tvMemoryText = itemView.findViewById(R.id.tvMemoryText);
 
@@ -77,7 +78,7 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
         }
 
         void bind(MemoryCard card, int position) {
-            // Configura o conteúdo da frente da carta
+            // 1. Configura o conteúdo da frente da carta (imagem ou texto)
             if (card.isImage()) {
                 ivMemoryImage.setVisibility(View.VISIBLE);
                 tvMemoryText.setVisibility(View.GONE);
@@ -88,23 +89,25 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
                 tvMemoryText.setText(card.getGesture().getLetter());
             }
 
-            // Define visibilidade inicial (sem animação)
+            // 2. Define a cor de fundo para a parte de trás da carta
+            cardBack.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_back_color));
+            // Opcional: Para remover a borda padrão do MaterialCardView se houver
+            cardBack.setStrokeWidth(0);
+
+            // 3. Define a cor de fundo para a parte da frente da carta com base no estado
+            if (card.isMatched()) {
+                cardFront.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_matched_color));
+            } else if (position == selectedPosition) {
+                cardFront.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_selected_color));
+            } else {
+                cardFront.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_front_default_color));
+            }
+            // Opcional: Para remover a borda padrão do MaterialCardView se houver
+            cardFront.setStrokeWidth(0);
+
+            // 4. Define a visibilidade inicial (sem animação, isso é controlado pelo Fragment)
             cardFront.setVisibility(card.isFlipped() ? View.VISIBLE : View.INVISIBLE);
             cardBack.setVisibility(card.isFlipped() ? View.INVISIBLE : View.VISIBLE);
-
-            // Ajusta a aparência com base no estado
-            if (card.isMatched()) {
-                cardFront.setStrokeColor(context.getColor(R.color.memory_card_matched_stroke));
-                cardFrontContent.setBackgroundColor(context.getColor(R.color.memory_card_matched_tint));
-            } else if (position == selectedPosition) {
-                // Estado Selecionado
-                cardFront.setStrokeColor(context.getColor(R.color.memory_card_selected_stroke));
-                cardFrontContent.setBackgroundColor(context.getColor(R.color.white));
-            } else {
-                // Estado Padrão
-                cardFront.setStrokeColor(context.getColor(R.color.memory_card_default_stroke));
-                cardFrontContent.setBackgroundColor(context.getColor(R.color.white));
-            }
         }
     }
 }

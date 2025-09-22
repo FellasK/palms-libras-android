@@ -20,7 +20,7 @@ public class AuthActivity extends AppCompatActivity {
 
     private EditText nameEditText, emailEditText, passwordEditText;
     private Button mainActionButton, secondaryAuthButton;
-    private TextView subtitleText; // Adicionado para mudar o subtítulo
+    private TextView subtitleText;
     private DatabaseHelper dbHelper;
     private SessionManager sessionManager;
     private boolean isLoginView = true; // Começa na tela de login
@@ -47,15 +47,12 @@ public class AuthActivity extends AppCompatActivity {
         // Listener do botão principal (Roxo)
         mainActionButton.setOnClickListener(v -> {
             if (isLoginView) {
-                // Se está na tela de login, executa o login
                 loginUser();
             } else {
-                // Se está na tela de cadastro, executa o cadastro
                 registerUser();
             }
         });
 
-        // Listener do botão secundário (Link de texto)
         secondaryAuthButton.setOnClickListener(v -> {
             // A única função deste botão é alternar a visualização
             isLoginView = !isLoginView; // Inverte o modo (true vira false, false vira true)

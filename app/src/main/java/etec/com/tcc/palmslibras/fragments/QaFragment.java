@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RadioButton; // Importação adicionada
 import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,8 +26,13 @@ public class QaFragment extends Fragment implements View.OnClickListener {
 
     private OnLessonCompleteListener listener;
     private Lesson lessonData;
-    private List<ImageView> optionViews = new ArrayList<>();
+    private List<View> optionViews = new ArrayList<>();
     private boolean isAnswered = false;
+
+    // Mapeia os IDs dos RadioButtons e ImageViews para facilitar o acesso
+    private final int[] radioButtonIds = {R.id.rbOptionA, R.id.rbOptionB, R.id.rbOptionC, R.id.rbOptionD};
+    private final int[] imageViewIds = {R.id.ivOptionA, R.id.ivOptionB, R.id.ivOptionC, R.id.ivOptionD};
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -50,21 +57,24 @@ public class QaFragment extends Fragment implements View.OnClickListener {
         String questionText = getString(R.string.qa_question_template, lessonData.getCorrectAnswer().getLetter());
         tvQuestion.setText(questionText);
 
-        optionViews.add(view.findViewById(R.id.ivOptionA));
-        optionViews.add(view.findViewById(R.id.ivOptionB));
-        optionViews.add(view.findViewById(R.id.ivOptionC));
-        optionViews.add(view.findViewById(R.id.ivOptionD));
+        optionViews.add(view.findViewById(R.id.optionA));
+        optionViews.add(view.findViewById(R.id.optionB));
+        optionViews.add(view.findViewById(R.id.optionC));
+        optionViews.add(view.findViewById(R.id.optionD));
 
         for (int i = 0; i < optionViews.size(); i++) {
-            ImageView imageView = optionViews.get(i);
+            View optionContainer = optionViews.get(i);
+            ImageView imageView = optionContainer.findViewById(imageViewIds[i]);
+
             Gesture gesture = lessonData.getOptions().get(i);
+
             imageView.setImageResource(gesture.getDrawableId());
-            imageView.setTag(gesture);
+            optionContainer.setTag(gesture);
 
             String contentDesc = getString(R.string.qa_option_image_description, gesture.getLetter());
-            imageView.setContentDescription(contentDesc);
+            optionContainer.setContentDescription(contentDesc);
 
-            imageView.setOnClickListener(this);
+            optionContainer.setOnClickListener(this);
         }
 
         return view;
@@ -75,6 +85,12 @@ public class QaFragment extends Fragment implements View.OnClickListener {
         if (isAnswered) return;
         isAnswered = true;
 
+        // Encontra o RadioButton dentro do LinearLayout que foi clicado (v) e o marca
+        if (v instanceof ViewGroup && ((ViewGroup) v).getChildAt(0) instanceof RadioButton) {
+            RadioButton selectedRb = (RadioButton) ((ViewGroup) v).getChildAt(0);
+            selectedRb.setChecked(true);
+        }
+
         Gesture selectedGesture = (Gesture) v.getTag();
         Gesture correctGesture = lessonData.getCorrectAnswer();
 
@@ -84,17 +100,26 @@ public class QaFragment extends Fragment implements View.OnClickListener {
             v.setBackgroundResource(R.drawable.choice_correct_background);
         } else {
             v.setBackgroundResource(R.drawable.choice_incorrect_background);
-            findCorrectOptionView(correctGesture).setBackgroundResource(R.drawable.choice_correct_background);
+            View correctOptionView = findCorrectOptionView(correctGesture);
+            if (correctOptionView != null) {
+                correctOptionView.setBackgroundResource(R.drawable.choice_correct_background);
+
+                // Marca também o RadioButton da resposta correta
+                if (correctOptionView instanceof ViewGroup && ((ViewGroup) correctOptionView).getChildAt(0) instanceof RadioButton) {
+                    RadioButton correctRb = (RadioButton) ((ViewGroup) correctOptionView).getChildAt(0);
+                    correctRb.setChecked(true);
+                }
+            }
         }
 
         listener.onLessonCompleted(isCorrect);
     }
 
     private View findCorrectOptionView(Gesture correctGesture) {
-        for (ImageView iv : optionViews) {
-            Gesture gesture = (Gesture) iv.getTag();
+        for (View optionView : optionViews) {
+            Gesture gesture = (Gesture) optionView.getTag();
             if (gesture.getLetter().equals(correctGesture.getLetter())) {
-                return iv;
+                return optionView;
             }
         }
         return null;
