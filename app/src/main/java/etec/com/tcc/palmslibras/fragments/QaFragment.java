@@ -5,10 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioButton; // Importação adicionada
 import android.widget.TextView;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,12 +26,11 @@ public class QaFragment extends Fragment implements View.OnClickListener {
     private OnLessonCompleteListener listener;
     private Lesson lessonData;
     private List<View> optionViews = new ArrayList<>();
+    private Button btnVerify;
+    private View selectedOption = null;
     private boolean isAnswered = false;
 
-    // Mapeia os IDs dos RadioButtons e ImageViews para facilitar o acesso
-    private final int[] radioButtonIds = {R.id.rbOptionA, R.id.rbOptionB, R.id.rbOptionC, R.id.rbOptionD};
     private final int[] imageViewIds = {R.id.ivOptionA, R.id.ivOptionB, R.id.ivOptionC, R.id.ivOptionD};
-
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -53,21 +51,35 @@ public class QaFragment extends Fragment implements View.OnClickListener {
             lessonData = (Lesson) getArguments().getSerializable("lesson_data");
         }
 
-        TextView tvQuestion = view.findViewById(R.id.tvQuestion);
-        String questionText = getString(R.string.qa_question_template, lessonData.getCorrectAnswer().getLetter());
-        tvQuestion.setText(questionText);
+        initializeViews(view);
+        setupQuestion(view);
+        setupOptions();
+
+        return view;
+    }
+
+    private void initializeViews(View view) {
+        btnVerify = view.findViewById(R.id.btnVerify);
+        btnVerify.setOnClickListener(v -> verifyAnswer());
 
         optionViews.add(view.findViewById(R.id.optionA));
         optionViews.add(view.findViewById(R.id.optionB));
         optionViews.add(view.findViewById(R.id.optionC));
         optionViews.add(view.findViewById(R.id.optionD));
+    }
 
+    private void setupQuestion(View view) {
+        TextView tvQuestion = view.findViewById(R.id.tvQuestion);
+        String questionText = getString(R.string.qa_question_template, lessonData.getCorrectAnswer().getLetter());
+        tvQuestion.setText(questionText);
+    }
+
+    private void setupOptions() {
         for (int i = 0; i < optionViews.size(); i++) {
             View optionContainer = optionViews.get(i);
             ImageView imageView = optionContainer.findViewById(imageViewIds[i]);
 
             Gesture gesture = lessonData.getOptions().get(i);
-
             imageView.setImageResource(gesture.getDrawableId());
             optionContainer.setTag(gesture);
 
@@ -76,42 +88,51 @@ public class QaFragment extends Fragment implements View.OnClickListener {
 
             optionContainer.setOnClickListener(this);
         }
-
-        return view;
     }
 
     @Override
     public void onClick(View v) {
         if (isAnswered) return;
-        isAnswered = true;
 
-        // Encontra o RadioButton dentro do LinearLayout que foi clicado (v) e o marca
-        if (v instanceof ViewGroup && ((ViewGroup) v).getChildAt(0) instanceof RadioButton) {
-            RadioButton selectedRb = (RadioButton) ((ViewGroup) v).getChildAt(0);
-            selectedRb.setChecked(true);
+        // Limpa a seleção anterior
+        for (View optionView : optionViews) {
+            optionView.setBackgroundResource(R.drawable.choice_default_background);
         }
 
-        Gesture selectedGesture = (Gesture) v.getTag();
-        Gesture correctGesture = lessonData.getCorrectAnswer();
+        // Define a nova seleção
+        selectedOption = v;
+        selectedOption.setBackgroundResource(R.drawable.choice_selected_background);
 
+        // Habilita o botão de verificar
+        btnVerify.setEnabled(true);
+    }
+
+    private void verifyAnswer() {
+        if (isAnswered || selectedOption == null) return;
+        isAnswered = true;
+
+        // Desabilita as opções para evitar novos cliques
+        for (View optionView : optionViews) {
+            optionView.setClickable(false);
+        }
+
+        Gesture selectedGesture = (Gesture) selectedOption.getTag();
+        Gesture correctGesture = lessonData.getCorrectAnswer();
         boolean isCorrect = selectedGesture.getLetter().equals(correctGesture.getLetter());
 
+        // ** LÓGICA DE FEEDBACK VISUAL APENAS NAS ALTERNATIVAS **
         if (isCorrect) {
-            v.setBackgroundResource(R.drawable.choice_correct_background);
+            selectedOption.setBackgroundResource(R.drawable.choice_correct_background);
         } else {
-            v.setBackgroundResource(R.drawable.choice_incorrect_background);
+            selectedOption.setBackgroundResource(R.drawable.choice_incorrect_background);
             View correctOptionView = findCorrectOptionView(correctGesture);
             if (correctOptionView != null) {
                 correctOptionView.setBackgroundResource(R.drawable.choice_correct_background);
-
-                // Marca também o RadioButton da resposta correta
-                if (correctOptionView instanceof ViewGroup && ((ViewGroup) correctOptionView).getChildAt(0) instanceof RadioButton) {
-                    RadioButton correctRb = (RadioButton) ((ViewGroup) correctOptionView).getChildAt(0);
-                    correctRb.setChecked(true);
-                }
             }
         }
 
+        // Esconde o botão e notifica a activity
+        btnVerify.setVisibility(View.GONE);
         listener.onLessonCompleted(isCorrect);
     }
 

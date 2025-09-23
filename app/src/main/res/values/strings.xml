@@ -19,10 +19,16 @@
 
     <string name="close_button_description">Fechar atividade</string>
     <string name="lives_icon_description">Ícone de vidas</string>
-    <string name="feedback_correct">Excelente!</string>
-    <string name="feedback_correct_xp">Correto! +%1$d XP</string>
-    <string name="feedback_incorrect">Resposta Incorreta</string>
+    <string name="button_verify">VERIFICAR</string>
+    <string name="feedback_correct">EXCELENTE!</string>
+    <string name="feedback_correct_xp">CORRETO! +%1$d XP</string>
+    <string name="feedback_incorrect">INCORRETO!</string>
     <string name="no_more_lives_toast">Você ficou sem vidas!</string>
+
+    <string name="option_a_description">Opção A</string>"
+    <string name="option_b_description">Opção B</string>"
+    <string name="option_c_description">Opção C</string>"
+    <string name="option_d_description">Opção D</string>"
 
     <string name="qa_question_template">Qual o sinal para a letra \'%1$s\'?</string>
     <string name="qa_option_image_description">Opção com o gesto da letra %1$s</string>
