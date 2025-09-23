@@ -5,7 +5,8 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/primary_blue</item>
         <item name="colorOnSecondary">@color/black</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/gray_background</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="M">true</item>
         <item name="android:windowBackground">@color/gray_background</item>
     </style>
 
