@@ -33,8 +33,8 @@ public class CourseFragment extends Fragment {
         List<Course> courseList = new ArrayList<>();
         courseList.add(new Course("Alfabeto", "Aprenda o alfabeto do A ao Z", R.drawable.ic_activities, 1));
         courseList.add(new Course("Números", "Aprenda os números de 1 a 10", R.drawable.ic_activities, 2));
-        // Adicione mais cursos/lições aqui
-
+        courseList.add(new Course("Cores", "Aprenda as principais cores", R.drawable.ic_activities, 3));
+        //lugar para adicionar mais cursos
         CourseAdapter adapter = new CourseAdapter(courseList, getContext());
         coursesRecyclerView.setAdapter(adapter);
 

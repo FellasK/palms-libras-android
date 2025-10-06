@@ -50,7 +50,6 @@
                 android:scaleType="centerInside"
                 tools:src="@drawable/ic_placeholder_gesture" />
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/optionB"
             android:layout_width="match_parent"
@@ -112,9 +111,10 @@
                 android:layout_marginStart="16dp"
                 android:scaleType="centerInside"
                 tools:src="@drawable/ic_placeholder_gesture" />
-        </LinearLayout>
-    </LinearLayout>
 
+        </LinearLayout>
+
+    </LinearLayout>
     <Button
         android:id="@+id/btnVerify"
         android:layout_width="0dp"
