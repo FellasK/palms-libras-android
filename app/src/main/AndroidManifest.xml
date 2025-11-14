@@ -39,6 +39,7 @@
             android:exported="false"
             android:theme="@style/Theme.PalmsLibras.NoActionBar" />
 
+        <activity android:name=".activities.UnitResultsActivity" />
     </application>
 
 </manifest>

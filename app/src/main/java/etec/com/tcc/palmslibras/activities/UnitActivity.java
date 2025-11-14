@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import etec.com.tcc.palmslibras.R;
+import etec.com.tcc.palmslibras.fragments.ConnectGameFragment;
 import etec.com.tcc.palmslibras.fragments.MemoryFragment;
 import etec.com.tcc.palmslibras.fragments.QaFragment;
 import etec.com.tcc.palmslibras.models.Gesture;
@@ -100,6 +101,11 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
                 List<Gesture> memoryPairs = new ArrayList<>(unitGestures.subList(0, 4));
                 exercicesQueue.add(Exercices.createMemoryLesson(memoryPairs));
             }
+            if (i > 0 && i % 5 == 0) {
+                Collections.shuffle(unitGestures);
+                List<Gesture> connectOptions = new ArrayList<>(unitGestures.subList(0, 4)); // Pega 4 gestos para os pares
+                exercicesQueue.add(Exercices.createConnectLesson(connectOptions));
+            }
 
             List<Gesture> options = GestureManager.getRandomGestures(currentGesture, 3);
             options.add(currentGesture);
@@ -123,6 +129,9 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         switch (exercices.getType()) {
             case MEMORY_GAME:
                 lessonFragment = new MemoryFragment();
+                break;
+            case CONNECT_GAME: // Adicione este case
+                lessonFragment = new ConnectGameFragment();
                 break;
             case QUESTION_ANSWER:
             default:

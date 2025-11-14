@@ -31,6 +31,9 @@
     <color name="memory_card_default">#e0e0e0</color>
     <color name="memory_card_selected">#91d7ff</color>
     <color name="memory_card_matched">#b5acff</color>
+    <color name="connect_card_matched_bg">#C8E6C9</color>
+    <color name="connect_card_selected_bg">#BBDEFB</color>
+    <color name="connect_card_default_bg">#FFFFFF</color>
     <color name="card_back_color">#E0E0E0</color>
     <color name="card_matched_color">#B5ACFF</color>
     <color name="card_selected_color">#91D7FF</color>

@@ -36,6 +36,8 @@
     <string name="memory_game_title_detailed">Encontre os pares de palavras e seus gestos:</string>
     <string name="memory_pairs_found_template">Pares encontrados %1$d/%2$d</string>
 
+    <string name="connect_game_title_detailed">Combine as palavras com os gestos corretos</string>
+
     <string name="results_title">Unidade Concluída!</string>
     <string name="results_total_xp">XP Total</string>
     <string name="results_accuracy">Precisão</string>
