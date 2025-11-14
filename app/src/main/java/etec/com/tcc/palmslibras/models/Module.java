@@ -5,7 +5,7 @@ import java.util.List;
 public class Module {
     private int id;
     private String title;
-    private List<Lesson> lessons;
+    private List<Exercices> activityData;
 
     // Construtores, getters e setters
 }

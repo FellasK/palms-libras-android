@@ -18,13 +18,13 @@ import java.util.List;
 
 import etec.com.tcc.palmslibras.R;
 import etec.com.tcc.palmslibras.models.Gesture;
-import etec.com.tcc.palmslibras.models.Lesson;
+import etec.com.tcc.palmslibras.models.Exercices;
 import etec.com.tcc.palmslibras.utils.OnLessonCompleteListener;
 
 public class QaFragment extends Fragment implements View.OnClickListener {
 
     private OnLessonCompleteListener listener;
-    private Lesson lessonData;
+    private Exercices exercices;
     private List<View> optionViews = new ArrayList<>();
     private Button btnVerify;
     private View selectedOption = null;
@@ -48,7 +48,7 @@ public class QaFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_qa, container, false);
 
         if (getArguments() != null) {
-            lessonData = (Lesson) getArguments().getSerializable("lesson_data");
+            exercices = (Exercices) getArguments().getSerializable("lesson_data");
         }
 
         initializeViews(view);
@@ -70,7 +70,7 @@ public class QaFragment extends Fragment implements View.OnClickListener {
 
     private void setupQuestion(View view) {
         TextView tvQuestion = view.findViewById(R.id.tvQuestion);
-        String questionText = getString(R.string.qa_question_template, lessonData.getCorrectAnswer().getLetter());
+        String questionText = getString(R.string.qa_question_template, exercices.getCorrectAnswer().getLetter());
         tvQuestion.setText(questionText);
     }
 
@@ -79,7 +79,7 @@ public class QaFragment extends Fragment implements View.OnClickListener {
             View optionContainer = optionViews.get(i);
             ImageView imageView = optionContainer.findViewById(imageViewIds[i]);
 
-            Gesture gesture = lessonData.getOptions().get(i);
+            Gesture gesture = exercices.getOptions().get(i);
             imageView.setImageResource(gesture.getDrawableId());
             optionContainer.setTag(gesture);
 
@@ -117,7 +117,7 @@ public class QaFragment extends Fragment implements View.OnClickListener {
         }
 
         Gesture selectedGesture = (Gesture) selectedOption.getTag();
-        Gesture correctGesture = lessonData.getCorrectAnswer();
+        Gesture correctGesture = exercices.getCorrectAnswer();
         boolean isCorrect = selectedGesture.getLetter().equals(correctGesture.getLetter());
 
         // ** LÓGICA DE FEEDBACK VISUAL APENAS NAS ALTERNATIVAS **

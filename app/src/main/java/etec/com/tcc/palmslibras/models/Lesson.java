@@ -1,48 +1,35 @@
 package etec.com.tcc.palmslibras.models;
 
 import java.io.Serializable;
-import java.util.List;
 
+// Esta é a classe do MÓDULO, que corresponde à tabela LessonEntry.
 public class Lesson implements Serializable {
+    private long id;
+    private String title;
+    private String description;
+    private int orderIndex;
 
-    public enum LessonType {
-        QUESTION_ANSWER,
-        MEMORY_GAME
+    public Lesson(long id, String title, String description, int orderIndex) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.orderIndex = orderIndex;
     }
 
-    private LessonType type;
-    private List<Gesture> options;
-    private Gesture correctAnswer;
-    private List<Gesture> memoryPairs;
-
-    public LessonType getType() {
-        return type;
+    // ... (Getters) ...
+        public long getId(){
+        return id;
     }
 
-    public List<Gesture> getOptions() {
-        return options;
+    public String getTitle(){
+        return title;
     }
 
-    public Gesture getCorrectAnswer() {
-        return correctAnswer;
+    public String getDescription(){
+        return description;
     }
 
-    public List<Gesture> getMemoryPairs() {
-        return memoryPairs;
-    }
-
-    public static Lesson createQaLesson(List<Gesture> options, Gesture correctAnswer) {
-        Lesson lesson = new Lesson();
-        lesson.type = LessonType.QUESTION_ANSWER;
-        lesson.options = options;
-        lesson.correctAnswer = correctAnswer;
-        return lesson;
-    }
-
-    public static Lesson createMemoryLesson(List<Gesture> pairs) {
-        Lesson lesson = new Lesson();
-        lesson.type = LessonType.MEMORY_GAME;
-        lesson.memoryPairs = pairs;
-        return lesson;
+    public int getOrderIndex(){
+        return orderIndex;
     }
 }

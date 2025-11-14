@@ -24,14 +24,14 @@ import java.util.List;
 import etec.com.tcc.palmslibras.R;
 import etec.com.tcc.palmslibras.adapters.MemoryCardAdapter;
 import etec.com.tcc.palmslibras.models.Gesture;
-import etec.com.tcc.palmslibras.models.Lesson;
+import etec.com.tcc.palmslibras.models.Exercices;
 import etec.com.tcc.palmslibras.models.MemoryCard;
 import etec.com.tcc.palmslibras.utils.OnLessonCompleteListener;
 
 public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCardClickListener {
 
     private OnLessonCompleteListener listener;
-    private Lesson lessonData;
+    private Exercices exercices;
     private RecyclerView memoryGrid;
     private MemoryCardAdapter adapter;
     private TextView tvPairsCounter; // View para o contador
@@ -57,7 +57,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
         View view = inflater.inflate(R.layout.fragment_memory, container, false);
 
         if (getArguments() != null) {
-            lessonData = (Lesson) getArguments().getSerializable("lesson_data");
+            exercices = (Exercices) getArguments().getSerializable("lesson_data");
         }
 
         // Inicializa as views do novo layout
@@ -69,7 +69,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
     }
 
     private void setupMemoryGame() {
-        for(Gesture g : lessonData.getMemoryPairs()){
+        for(Gesture g : exercices.getMemoryPairs()){
             cards.add(new MemoryCard(g, true));
             cards.add(new MemoryCard(g, false));
         }
@@ -86,7 +86,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
 
     // Novo método para atualizar o texto do contador
     private void updatePairsCounter() {
-        int totalPairs = lessonData.getMemoryPairs().size();
+        int totalPairs = exercices.getMemoryPairs().size();
         tvPairsCounter.setText(getString(R.string.memory_pairs_found_template, matchedPairs, totalPairs));
     }
 
@@ -160,7 +160,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
                 adapter.notifyItemChanged(firstPos);
                 adapter.notifyItemChanged(secondPos);
                 isChecking = false;
-                if (matchedPairs == lessonData.getMemoryPairs().size()) {
+                if (matchedPairs == exercices.getMemoryPairs().size()) {
                     new Handler(Looper.getMainLooper()).postDelayed(() -> listener.onLessonCompleted(true), 800);
                 }
             }, 300);

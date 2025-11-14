@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -25,7 +24,7 @@ import etec.com.tcc.palmslibras.R;
 import etec.com.tcc.palmslibras.fragments.MemoryFragment;
 import etec.com.tcc.palmslibras.fragments.QaFragment;
 import etec.com.tcc.palmslibras.models.Gesture;
-import etec.com.tcc.palmslibras.models.Lesson;
+import etec.com.tcc.palmslibras.models.Exercices;
 import etec.com.tcc.palmslibras.utils.GestureManager;
 import etec.com.tcc.palmslibras.utils.OnLessonCompleteListener;
 
@@ -37,7 +36,7 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
     private ImageButton closeButton;
     private List<ImageView> hearts = new ArrayList<>();
 
-    private List<Lesson> lessonQueue = new ArrayList<>();
+    private List<Exercices> exercicesQueue = new ArrayList<>();
     private int currentLessonIndex = 0;
     private int lives = 5;
     private final int MAX_LIVES = 5;
@@ -99,29 +98,29 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
             if (i > 0 && i % 3 == 0) {
                 Collections.shuffle(unitGestures);
                 List<Gesture> memoryPairs = new ArrayList<>(unitGestures.subList(0, 4));
-                lessonQueue.add(Lesson.createMemoryLesson(memoryPairs));
+                exercicesQueue.add(Exercices.createMemoryLesson(memoryPairs));
             }
 
             List<Gesture> options = GestureManager.getRandomGestures(currentGesture, 3);
             options.add(currentGesture);
             Collections.shuffle(options);
-            lessonQueue.add(Lesson.createQaLesson(options, currentGesture));
+            exercicesQueue.add(Exercices.createQaLesson(options, currentGesture));
         }
 
-        progressBar.setMax(lessonQueue.size());
+        progressBar.setMax(exercicesQueue.size());
         progressBar.setProgress(0);
     }
 
     private void loadCurrentLesson() {
-        if (currentLessonIndex >= lessonQueue.size()) {
+        if (currentLessonIndex >= exercicesQueue.size()) {
             showUnitResults();
             return;
         }
 
-        Lesson lesson = lessonQueue.get(currentLessonIndex);
+        Exercices exercices = exercicesQueue.get(currentLessonIndex);
         Fragment lessonFragment;
 
-        switch (lesson.getType()) {
+        switch (exercices.getType()) {
             case MEMORY_GAME:
                 lessonFragment = new MemoryFragment();
                 break;
@@ -132,7 +131,7 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         }
 
         Bundle args = new Bundle();
-        args.putSerializable("lesson_data", lesson);
+        args.putSerializable("lesson_data", exercices);
         lessonFragment.setArguments(args);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -192,7 +191,7 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
     private void showUnitResults() {
         Intent intent = new Intent(this, UnitResultsActivity.class);
         intent.putExtra("XP_GAINED", xpGained);
-        intent.putExtra("LESSONS_COMPLETED", lessonQueue.size());
+        intent.putExtra("LESSONS_COMPLETED", exercicesQueue.size());
         intent.putExtra("CORRECT_ANSWERS", correctAnswers);
         startActivity(intent);
         finish();
