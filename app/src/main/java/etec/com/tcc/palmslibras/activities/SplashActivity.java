@@ -30,6 +30,6 @@ public class SplashActivity extends AppCompatActivity {
             }
             startActivity(intent);
             finish();
-        }, 3000); // 3 segundos de espera
+        }, 2000); // 2 segundos de espera
     }
 }
