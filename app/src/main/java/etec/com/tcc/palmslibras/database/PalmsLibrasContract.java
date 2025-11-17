@@ -12,7 +12,6 @@ public final class PalmsLibrasContract {
         public static final String COLUMN_NAME_EMAIL = "email";
         public static final String COLUMN_NAME_PASSWORD_HASH = "password";
 
-        public static final String COLUMN_NAME_SALT = "salt";
         public static final String COLUMN_NAME_XP = "xp";
         public static final String COLUMN_NAME_LEVEL = "level";
         public static final String COLUMN_NAME_STREAK = "streak";

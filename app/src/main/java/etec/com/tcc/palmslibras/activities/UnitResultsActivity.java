@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Locale;
 
 import etec.com.tcc.palmslibras.R;
+import etec.com.tcc.palmslibras.database.DatabaseHelper;
+import etec.com.tcc.palmslibras.utils.SessionManager;
 
 public class UnitResultsActivity extends AppCompatActivity {
 
@@ -17,6 +19,9 @@ public class UnitResultsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unit_results);
 
+        SessionManager sessionManager = new SessionManager(this);
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+
         TextView tvTotalXp = findViewById(R.id.tvTotalXp);
         TextView tvAccuracy = findViewById(R.id.tvAccuracy);
         Button btnFinish = findViewById(R.id.btnFinish);
@@ -24,6 +29,11 @@ public class UnitResultsActivity extends AppCompatActivity {
         int xpGained = getIntent().getIntExtra("XP_GAINED", 0);
         int lessonsCompleted = getIntent().getIntExtra("LESSONS_COMPLETED", 1);
         int correctAnswers = getIntent().getIntExtra("CORRECT_ANSWERS", 0);
+
+        long userId = sessionManager.getUserId();
+        if (userId != -1) {
+            dbHelper.updateUserStats(userId, xpGained, correctAnswers, lessonsCompleted);
+        }
 
         tvTotalXp.setText(getString(R.string.results_xp_format, xpGained));
 

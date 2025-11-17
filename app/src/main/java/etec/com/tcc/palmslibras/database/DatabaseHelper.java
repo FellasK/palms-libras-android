@@ -104,9 +104,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         // Adicione usuários de exemplo para o ranking
-        addUser(db, "Maria", "maria@email.com", "123", 1250);
-        addUser(db, "João", "joao@email.com", "123", 980);
-        addUser(db, "Ana", "ana@email.com", "123", 750);
+        addInitialUser(db, "Maria", "maria@email.com", "123", 1250);
+        addInitialUser(db, "João", "joao@email.com", "123", 980);
+        addInitialUser(db, "Ana", "ana@email.com", "123", 750);
+    }
+
+
+    private void addInitialUser(SQLiteDatabase db, String name, String email, String password, int xp) {
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        ContentValues values = new ContentValues();
+        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_NAME, name);
+        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_EMAIL, email);
+        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_PASSWORD_HASH, hashedPassword);
+        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_XP, xp);
+        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_LEVEL, 1);
+        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_STREAK, 0);
+        db.insert(PalmsLibrasContract.UserEntry.TABLE_NAME, null, values);
     }
 
     private void addActivity(SQLiteDatabase db, int lessonId, String question, String options, String answer, int xp, String type) {
@@ -120,33 +133,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(PalmsLibrasContract.ActivityEntry.TABLE_NAME, null, values);
     }
 
-    private void addUser(SQLiteDatabase db, String name, String email, String password, int xp) {
-        String salt = BCrypt.gensalt();
-        String hashedPassword = BCrypt.hashpw(password, salt);
-        ContentValues values = new ContentValues();
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_NAME, name);
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_EMAIL, email);
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_PASSWORD_HASH, hashedPassword);
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_SALT, salt);
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_XP, xp);
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_LEVEL, 1);
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_STREAK, 0);
-        db.insert(PalmsLibrasContract.UserEntry.TABLE_NAME, null, values);
-    }
 
+    public boolean checkUserExists(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                PalmsLibrasContract.UserEntry.TABLE_NAME, // Tabela
+                new String[]{PalmsLibrasContract.UserEntry._ID}, // Coluna para checar
+                PalmsLibrasContract.UserEntry.COLUMN_NAME_EMAIL + "=?", // Cláusula WHERE
+                new String[]{email}, // Argumentos do WHERE
+                null, null, null
+        );
+
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        return exists;
+    }
     public long addUser(String name, String email, String password) {
-        String salt = BCrypt.gensalt();
-        String hashedPassword = BCrypt.hashpw(password, salt);
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+
+        // 1. Gere o hash da senha (o salt já está incluído pelo jBCrypt)
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+        // 2. Adicione os valores, sem a coluna 'salt'
         values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_NAME, name);
         values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_EMAIL, email);
         values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_PASSWORD_HASH, hashedPassword);
-        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_SALT, salt);
+        values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_XP, 0); // XP inicial
         values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_LEVEL, 1);
         values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_STREAK, 0);
+
+        // 3. Insira no banco de dados e feche a conexão
         long id = db.insert(PalmsLibrasContract.UserEntry.TABLE_NAME, null, values);
-        db.close();
         return id;
     }
 
@@ -158,8 +176,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         PalmsLibrasContract.UserEntry._ID,
                         PalmsLibrasContract.UserEntry.COLUMN_NAME_NAME,
                         PalmsLibrasContract.UserEntry.COLUMN_NAME_EMAIL,
-                        PalmsLibrasContract.UserEntry.COLUMN_NAME_PASSWORD_HASH, // Novo
-                        PalmsLibrasContract.UserEntry.COLUMN_NAME_SALT,           // Novo
+                        PalmsLibrasContract.UserEntry.COLUMN_NAME_PASSWORD_HASH,
                         PalmsLibrasContract.UserEntry.COLUMN_NAME_XP,
                         PalmsLibrasContract.UserEntry.COLUMN_NAME_LEVEL,
                         PalmsLibrasContract.UserEntry.COLUMN_NAME_STREAK
@@ -189,17 +206,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         if (cursor != null) cursor.close();
-        db.close();
         return user; // Retorna User se a senha estiver correta, ou null se não estiver ou o email não existir.
     }
 
+    public void updateUserStats(long userId, int xpToAdd, int correctAnswersInUnit, int totalLessonsInUnit) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        User currentUser = getUserById(userId);
+
+        if (currentUser != null) {
+            ContentValues values = new ContentValues();
+
+            // 1. Atualiza o XP
+            int newXp = currentUser.getXp() + xpToAdd;
+            values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_XP, newXp);
+
+            // 2. Atualiza o Streak (sequência)
+            // Se o usuário acertou mais de 50% da unidade, incrementa o streak.
+            // Você pode ajustar essa lógica como preferir.
+            if (correctAnswersInUnit > totalLessonsInUnit / 2) {
+                int newStreak = currentUser.getStreak() + 1;
+                values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_STREAK, newStreak);
+            }
+
+            // 3. Atualiza o nível (exemplo: a cada 1000 XP)
+            int newLevel = (newXp / 1000) + 1;
+            if (newLevel > currentUser.getLevel()) {
+                values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_LEVEL, newLevel);
+            }
+
+            // Executa a atualização no banco de dados
+            db.update(PalmsLibrasContract.UserEntry.TABLE_NAME,
+                    values,
+                    PalmsLibrasContract.UserEntry._ID + " = ?",
+                    new String[]{String.valueOf(userId)});
+        }
+    }
     public User getUserById(long userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(PalmsLibrasContract.UserEntry.TABLE_NAME, null,
                 PalmsLibrasContract.UserEntry._ID + "=?",
                 new String[]{String.valueOf(userId)}, null, null, null);
+        User user = null;
+
         if (cursor != null && cursor.moveToFirst()) {
-            User user = new User(
+            user = new User(
                     cursor.getLong(cursor.getColumnIndexOrThrow(PalmsLibrasContract.UserEntry._ID)),
                     cursor.getString(cursor.getColumnIndexOrThrow(PalmsLibrasContract.UserEntry.COLUMN_NAME_NAME)),
                     cursor.getString(cursor.getColumnIndexOrThrow(PalmsLibrasContract.UserEntry.COLUMN_NAME_EMAIL)),
@@ -207,13 +257,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndexOrThrow(PalmsLibrasContract.UserEntry.COLUMN_NAME_LEVEL)),
                     cursor.getInt(cursor.getColumnIndexOrThrow(PalmsLibrasContract.UserEntry.COLUMN_NAME_STREAK))
             );
-            cursor.close();
-            db.close();
-            return user;
         }
-        if (cursor != null) cursor.close();
-        db.close();
-        return null;
+        if (cursor != null) {
+            cursor.close();
+        }
+        return user;
     }
 
     public List<User> getAllUsersSortedByXP() {
@@ -234,19 +282,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return userList;
-    }
-
-    public void updateUserXp(long userId, int xpToAdd) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        User currentUser = getUserById(userId);
-        if (currentUser != null) {
-            ContentValues values = new ContentValues();
-            values.put(PalmsLibrasContract.UserEntry.COLUMN_NAME_XP, currentUser.getXp() + xpToAdd);
-            db.update(PalmsLibrasContract.UserEntry.TABLE_NAME, values, PalmsLibrasContract.UserEntry._ID + " = ?", new String[]{String.valueOf(userId)});
-        }
-        db.close();
     }
 
     public List<Activity> getActivitiesForLesson(int lessonId) {
@@ -269,7 +305,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return activityList;
     }
 

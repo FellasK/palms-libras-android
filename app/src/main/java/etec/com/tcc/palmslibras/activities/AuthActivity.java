@@ -106,6 +106,11 @@ public class AuthActivity extends AppCompatActivity {
             return;
         }
 
+        if (dbHelper.checkUserExists(email)) {
+            Toast.makeText(this, "Este e-mail já está em uso. Tente outro.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         long userId = dbHelper.addUser(name, email, password);
         if (userId != -1) {
             Toast.makeText(this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
@@ -113,7 +118,7 @@ public class AuthActivity extends AppCompatActivity {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         } else {
-            Toast.makeText(this, "Erro ao cadastrar. O email pode já estar em uso.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erro inesperado ao cadastrar.", Toast.LENGTH_SHORT).show();
         }
     }
 }
