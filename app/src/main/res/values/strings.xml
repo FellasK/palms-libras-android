@@ -16,6 +16,7 @@
     <string name="button_create_new_account">Criar uma conta</string>
 
     <string name="continue_button">Continuar</string>
+    <string name="in_development">Em breve</string>
 
     <string name="close_button_description">Fechar atividade</string>
     <string name="lives_icon_description">Ícone de vidas</string>
@@ -24,17 +25,20 @@
     <string name="feedback_correct_xp">CORRETO! +%1$d XP</string>
     <string name="feedback_incorrect">INCORRETO!</string>
     <string name="no_more_lives_toast">Você ficou sem vidas!</string>
+    <string name="interrogacao">?</string>
+    <string name="incentivo">Continue aprendendo</string>
 
-    <string name="option_a_description">Opção A</string>"
-    <string name="option_b_description">Opção B</string>"
-    <string name="option_c_description">Opção C</string>"
-    <string name="option_d_description">Opção D</string>"
+    <string name="option_a_description">Opção A</string>
+    <string name="option_b_description">Opção B</string>
+    <string name="option_c_description">Opção C</string>
+    <string name="option_d_description">Opção D</string>
 
     <string name="qa_question_template">Qual o sinal para a letra \'%1$s\'?</string>
     <string name="qa_option_image_description">Opção com o gesto da letra %1$s</string>
 
     <string name="memory_game_title_detailed">Encontre os pares de palavras e seus gestos:</string>
     <string name="memory_pairs_found_template">Pares encontrados %1$d/%2$d</string>
+    <string name="memory_card_image_content_desc">Imagem do gesto da letra</string>
 
     <string name="connect_game_title_detailed">Combine as palavras com os gestos corretos</string>
 
@@ -49,4 +53,32 @@
 
     <string name="hello_blank_fragment">Olá, fragmento em branco</string>
 
+    <string name="course_alphabet_title">Alfabeto</string>
+    <string name="course_alphabet_description">Aprenda o alfabeto do A ao Z</string>
+    <string name="course_alphabet_subtitle">Aprender do básico ao avançado</string>
+
+    <string name="unit_1_title">Unidade 1</string>
+    <string name="unit_1_subtitle">A ao M</string>
+    <string name="unit_1_description">Aprenda as letras do A ao M</string>
+
+    <string name="unit_2_title">Unidade 2</string>
+    <string name="unit_2_subtitle">N ao Z</string>
+    <string name="unit_2_description">Aprenda as letras do N ao Z</string>
+
+    <string name="units_count_initial">0/2 Unidades</string>
+    <string name="units_count_format">%1$d/%2$d Unidades</string>
+
+    <string name="exit_activity_confirmation">Você realmente quer sair da atividade? Seu progresso não será salvo.</string>
+    <string name="numbers_title">Números</string>
+    <string name="colors_title">Cores</string>
+    <string name="numbers_description">Aprender os números do 1 ao 10</string>
+    <string name="colors_description">Aprender as cores básicas e</string>
+    <string name="instruction_next">Entendi</string>
+    <string name="xp_earned_message">Você ganhou %1$d XP</string>
+    <string name="metrics_correct_label">Acertos</string>
+    <string name="metrics_xp_label">XP</string>
+    <string name="metrics_accuracy_label">Precisão</string>
+    <string name="camera_instruction_template">Faça um \'%1$s\'</string>
+    <string name="skip_button">Pular (Não posso no momento)</string>
+    <string name="in_development_toast">Ainda está em desenvolvimento</string>
 </resources>

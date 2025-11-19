@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:padding="8dp">
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    app:layout_constraintWidth_default="spread"
+    app:layout_constraintHeight_default="wrap">
 
     <FrameLayout
         android:id="@+id/card_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="3:4">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_back"
@@ -19,7 +26,22 @@
             app:cardElevation="4dp"
             app:strokeWidth="2dp"
             app:strokeColor="@color/memory_card_default_stroke"
-            app:cardBackgroundColor="@color/white">
+            app:cardBackgroundColor="@color/card_back_color">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tvQuestionMark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/interrogacao"
+                    android:textSize="34sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white" />
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -30,6 +52,7 @@
             app:cardElevation="4dp"
             app:strokeWidth="2dp"
             app:strokeColor="@color/memory_card_default_stroke"
+            app:cardBackgroundColor="@color/card_front_default_color"
             android:visibility="invisible"
             tools:visibility="visible">
 
@@ -44,6 +67,7 @@
                     android:id="@+id/ivMemoryImage"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
+                    android:contentDescription="@string/memory_card_image_content_desc"
                     android:scaleType="centerInside"
                     tools:src="@drawable/gesto_a"
                     android:visibility="gone" />
@@ -55,11 +79,12 @@
                     android:gravity="center"
                     android:textSize="40sp"
                     android:fontFamily="@font/open_sans_bold"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     tools:text="A"
                     android:visibility="gone" />
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
     </FrameLayout>
-</FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

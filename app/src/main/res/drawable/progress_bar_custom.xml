@@ -11,7 +11,7 @@
     <item android:id="@android:id/progress">
         <clip>
             <shape android:shape="rectangle">
-                <corners android:radius="16dp" />
+                <corners android:radius="100dp" />
                 <solid android:color="@color/progress_bar_progress" />
             </shape>
         </clip>

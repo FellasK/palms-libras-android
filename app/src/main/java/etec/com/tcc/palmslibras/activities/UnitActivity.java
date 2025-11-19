@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentTransaction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import etec.com.tcc.palmslibras.R;
 import etec.com.tcc.palmslibras.fragments.ConnectGameFragment;
@@ -43,6 +44,7 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
     private final int MAX_LIVES = 5;
     private int xpGained = 0;
     private int correctAnswers = 0;
+    private int unitNumber = 1;
 
     // Handler para agendar a próxima lição
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -72,7 +74,22 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         hearts.add(findViewById(R.id.heart4));
         hearts.add(findViewById(R.id.heart5));
 
-        closeButton.setOnClickListener(v -> finish());
+        closeButton.setOnClickListener(v -> {
+            int lessonsCompleted = currentLessonIndex;
+            int totalLessons = exercicesQueue != null ? exercicesQueue.size() : 0;
+            boolean shouldConfirm = lessonsCompleted >= 1;
+
+            if (!shouldConfirm) {
+                finish();
+                return;
+            }
+
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.exit_activity_confirmation))
+                    .setNegativeButton("Continuar", (dialog, which) -> dialog.dismiss())
+                    .setPositiveButton("Sair", (dialog, which) -> finish())
+                    .show();
+        });
         // A linha abaixo foi removida para desativar o clique no feedback
         // feedbackContainer.setOnClickListener(v -> proceedToNextLesson());
     }
@@ -88,29 +105,46 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         }
     }
 
-
     private void loadUnitLessons() {
-        List<Gesture> unitGestures = GestureManager.getGesturesForUnit(1);
-        Collections.shuffle(unitGestures);
+        unitNumber = getIntent().getIntExtra("UNIT_NUMBER", 1);
+        List<Gesture> unitGestures = GestureManager.getGesturesForUnit(unitNumber);
 
-        for (int i = 0; i < unitGestures.size(); i++) {
-            Gesture currentGesture = unitGestures.get(i);
+        final int CHUNK_SIZE = 4;
+        Random random = new Random();
+        for (int start = 0; start < unitGestures.size(); start += CHUNK_SIZE) {
+            int end = Math.min(start + CHUNK_SIZE, unitGestures.size());
+            List<Gesture> chunk = new ArrayList<>(unitGestures.subList(start, end));
 
-            if (i > 0 && i % 3 == 0) {
-                Collections.shuffle(unitGestures);
-                List<Gesture> memoryPairs = new ArrayList<>(unitGestures.subList(0, 4));
-                exercicesQueue.add(Exercices.createMemoryLesson(memoryPairs));
+            List<Exercices> segment = new ArrayList<>();
+            for (Gesture g : chunk) {
+                List<Gesture> options = GestureManager.getRandomGestures(g, 3);
+                options.add(g);
+                Collections.shuffle(options);
+                segment.add(Exercices.createInstruction(g));
+                segment.add(Exercices.createQaLesson(options, g));
+                segment.add(Exercices.createCameraExercise(g));
             }
-            if (i > 0 && i % 5 == 0) {
-                Collections.shuffle(unitGestures);
-                List<Gesture> connectOptions = new ArrayList<>(unitGestures.subList(0, 4)); // Pega 4 gestos para os pares
-                exercicesQueue.add(Exercices.createConnectLesson(connectOptions));
+
+            boolean includeMemory = random.nextBoolean();
+            boolean includeConnect = random.nextBoolean();
+            if (!includeMemory && !includeConnect) includeMemory = true;
+
+            if (includeMemory && chunk.size() >= 2) {
+                List<Gesture> memorySet = new ArrayList<>(chunk);
+                Collections.shuffle(memorySet);
+                int size = Math.min(4, Math.max(2, memorySet.size()));
+                segment.add(Exercices.createMemoryLesson(memorySet.subList(0, size)));
             }
 
-            List<Gesture> options = GestureManager.getRandomGestures(currentGesture, 3);
-            options.add(currentGesture);
-            Collections.shuffle(options);
-            exercicesQueue.add(Exercices.createQaLesson(options, currentGesture));
+            if (includeConnect && chunk.size() >= 2) {
+                List<Gesture> connectSet = new ArrayList<>(chunk);
+                Collections.shuffle(connectSet);
+                int size = Math.min(4, Math.max(2, connectSet.size()));
+                segment.add(Exercices.createConnectLesson(connectSet.subList(0, size)));
+            }
+
+            Collections.shuffle(segment, random);
+            exercicesQueue.addAll(segment);
         }
 
         progressBar.setMax(exercicesQueue.size());
@@ -129,6 +163,12 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         switch (exercices.getType()) {
             case MEMORY_GAME:
                 lessonFragment = new MemoryFragment();
+                break;
+            case INSTRUCTION:
+                lessonFragment = new etec.com.tcc.palmslibras.fragments.InstructionFragment();
+                break;
+            case CAMERA_EXERCISE:
+                lessonFragment = new etec.com.tcc.palmslibras.fragments.CameraExerciseFragment();
                 break;
             case CONNECT_GAME: // Adicione este case
                 lessonFragment = new ConnectGameFragment();
@@ -150,6 +190,12 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
 
     @Override
     public void onLessonCompleted(boolean isCorrect) {
+        Exercices current = exercicesQueue.get(currentLessonIndex);
+        if (current.getType() == Exercices.ActivityDataType.INSTRUCTION
+                || current.getType() == Exercices.ActivityDataType.CAMERA_EXERCISE) {
+            proceedToNextLesson();
+            return;
+        }
         if (isCorrect) {
             xpGained += 10;
             correctAnswers++;
@@ -181,7 +227,7 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         }, 3000);
     }
 
-    private void proceedToNextLesson(){
+    private void proceedToNextLesson() {
         // Esconde o feedback antes de carregar a próxima lição
         feedbackContainer.setVisibility(View.GONE);
 
@@ -198,12 +244,26 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
     }
 
     private void showUnitResults() {
-        Intent intent = new Intent(this, UnitResultsActivity.class);
-        intent.putExtra("XP_GAINED", xpGained);
-        intent.putExtra("LESSONS_COMPLETED", exercicesQueue.size());
-        intent.putExtra("CORRECT_ANSWERS", correctAnswers);
-        startActivity(intent);
-        finish();
+        int totalAssessable = 0;
+        for (Exercices ex : exercicesQueue) {
+            if (ex.getType() != Exercices.ActivityDataType.INSTRUCTION) totalAssessable++;
+        }
+        int maxXp = totalAssessable * 10;
+
+        etec.com.tcc.palmslibras.utils.SessionManager sm = new etec.com.tcc.palmslibras.utils.SessionManager(this);
+        etec.com.tcc.palmslibras.database.DatabaseHelper db = new etec.com.tcc.palmslibras.database.DatabaseHelper(this);
+        long userId = sm.getUserId();
+        if (userId != -1) {
+            db.updateUserStats(userId, xpGained, correctAnswers, exercicesQueue.size());
+        }
+        if (unitNumber == 1) {
+            sm.setUnit1Completed(true);
+            sm.setUnit2Unlocked(true);
+        }
+
+        etec.com.tcc.palmslibras.fragments.UnitCompleteDialogFragment dialog =
+                etec.com.tcc.palmslibras.fragments.UnitCompleteDialogFragment.newInstance(xpGained, maxXp, correctAnswers, totalAssessable);
+        dialog.show(getSupportFragmentManager(), "unit_complete_dialog");
     }
 
     @Override

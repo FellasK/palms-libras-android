@@ -82,7 +82,13 @@ public class ConnectCardAdapter extends RecyclerView.Adapter<ConnectCardAdapter.
             if (card.isImage()) {
                 ivCardImage.setVisibility(View.VISIBLE);
                 tvCardText.setVisibility(View.GONE);
-                ivCardImage.setImageResource(card.getGesture().getDrawableId());
+                int resId;
+                if (card.getVariant() > 0) {
+                    resId = etec.com.tcc.palmslibras.utils.SkinToneManager.getVariantResId(context, card.getGesture(), card.getVariant());
+                } else {
+                    resId = card.getGesture().getDrawableId();
+                }
+                ivCardImage.setImageResource(resId);
             } else {
                 ivCardImage.setVisibility(View.GONE);
                 tvCardText.setVisibility(View.VISIBLE);

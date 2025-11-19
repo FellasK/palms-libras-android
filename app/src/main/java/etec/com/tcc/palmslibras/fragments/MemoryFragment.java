@@ -69,19 +69,27 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
     }
 
     private void setupMemoryGame() {
+        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsEnsuringDiversity(exercices.getMemoryPairs().size());
+        int idx = 0;
         for(Gesture g : exercices.getMemoryPairs()){
-            cards.add(new MemoryCard(g, true));
+            MemoryCard img = new MemoryCard(g, true);
+            int v = (idx < variants.size()) ? variants.get(idx) : etec.com.tcc.palmslibras.utils.SkinToneManager.pickVariant();
+            img.setVariant(v);
+            cards.add(img);
             cards.add(new MemoryCard(g, false));
+            idx++;
         }
         Collections.shuffle(cards);
 
         adapter = new MemoryCardAdapter(getContext(), cards, this);
-        // Altera o número de colunas para 4
-        memoryGrid.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        memoryGrid.setLayoutManager(new GridLayoutManager(getContext(), calculateSpanCount()));
         memoryGrid.setAdapter(adapter);
+        memoryGrid.setHasFixedSize(true);
 
         // Inicia o contador
         updatePairsCounter();
+
+        memoryGrid.post(this::startWithPreview);
     }
 
     // Novo método para atualizar o texto do contador
@@ -90,9 +98,54 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
         tvPairsCounter.setText(getString(R.string.memory_pairs_found_template, matchedPairs, totalPairs));
     }
 
+    private int calculateSpanCount() {
+        Context ctx = getContext();
+        if (ctx == null) return 4;
+        float density = ctx.getResources().getDisplayMetrics().density;
+        int widthPx = ctx.getResources().getDisplayMetrics().widthPixels;
+        float widthDp = widthPx / density;
+        if (widthDp >= 600) return 6;
+        if (widthDp >= 400) return 4;
+        return 3;
+    }
+
+    private void startWithPreview() {
+        isChecking = true;
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            for (int i = 0; i < cards.size(); i++) {
+                if (!cards.get(i).isMatched()) {
+                    if (!cards.get(i).isFlipped()) {
+                        flipCard(i);
+                    }
+                }
+            }
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                for (int i = 0; i < cards.size(); i++) {
+                    if (!cards.get(i).isMatched()) {
+                        if (cards.get(i).isFlipped()) {
+                            flipCard(i);
+                        }
+                    }
+                }
+                isChecking = false;
+            }, 3000);
+        }, 1000);
+    }
+
     @Override
     public void onCardClick(int position) {
-        if (isChecking || cards.get(position).isFlipped() || cards.get(position).isMatched()) {
+        if (isChecking || cards.get(position).isMatched()) {
+            return;
+        }
+
+        if (firstSelectedIndex != null && position == firstSelectedIndex) {
+            adapter.setSelectedPosition(RecyclerView.NO_POSITION);
+            flipCard(position);
+            firstSelectedIndex = null;
+            return;
+        }
+
+        if (cards.get(position).isFlipped()) {
             return;
         }
 
@@ -165,10 +218,17 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
                 }
             }, 300);
         } else {
-            // Não deu Match
+            firstCard.setError(true);
+            secondCard.setError(true);
+            adapter.notifyItemChanged(firstPos);
+            adapter.notifyItemChanged(secondPos);
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 flipCard(firstPos);
                 flipCard(secondPos);
+                firstCard.setError(false);
+                secondCard.setError(false);
+                adapter.notifyItemChanged(firstPos);
+                adapter.notifyItemChanged(secondPos);
                 isChecking = false;
             }, 1000);
         }

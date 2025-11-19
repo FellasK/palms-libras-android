@@ -81,14 +81,28 @@ public class ConnectGameFragment extends Fragment implements ConnectCardAdapter.
         cards.clear();
 
         // ⭐ CORREÇÃO 2: Iterar sobre a lista correta, que é 'getOptions()'
-        for (Gesture g : lessonData.getOptions()) {
-            cards.add(new MemoryCard(g, true));  // Card com a imagem
+        List<Gesture> opts = lessonData.getOptions();
+        for (int i = 0; i < opts.size(); i++) {
+            Gesture g = opts.get(i);
+            MemoryCard imgCard = new MemoryCard(g, true);  // Card com a imagem
+            cards.add(imgCard);
             cards.add(new MemoryCard(g, false)); // Card com o texto
         }
         Collections.shuffle(cards);
 
         // Guarda o número total de pares
         totalPairs = lessonData.getOptions().size();
+        // Atribui variantes garantindo diversidade visual
+        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsEnsuringDiversity(totalPairs);
+        int assigned = 0;
+        for (int i = 0; i < cards.size(); i += 2) { // cada par: imagem + texto
+            MemoryCard img = cards.get(i); // imagem
+            if (img.isImage()) {
+                int v = (assigned < variants.size()) ? variants.get(assigned) : etec.com.tcc.palmslibras.utils.SkinToneManager.pickVariant();
+                img.setVariant(v);
+                assigned++;
+            }
+        }
 
         // Configura o adapter e o RecyclerView
         adapter = new ConnectCardAdapter(getContext(), cards, this);

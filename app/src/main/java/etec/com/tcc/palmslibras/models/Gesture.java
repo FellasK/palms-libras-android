@@ -22,8 +22,10 @@ public class Gesture implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Gesture gesture = (Gesture) o;
         return drawableId == gesture.drawableId && Objects.equals(letter, gesture.letter);
     }

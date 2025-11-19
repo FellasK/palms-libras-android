@@ -8,7 +8,9 @@ public class Exercices implements Serializable {
     public enum ActivityDataType {
         QUESTION_ANSWER,
         MEMORY_GAME,
-        CONNECT_GAME
+        CONNECT_GAME,
+        INSTRUCTION,
+        CAMERA_EXERCISE
     }
 
     private ActivityDataType type;
@@ -46,10 +48,25 @@ public class Exercices implements Serializable {
         exercices.memoryPairs = pairs;
         return exercices;
     }
+
     public static Exercices createConnectLesson(List<Gesture> options) {
         Exercices exercices = new Exercices();
         exercices.type = ActivityDataType.CONNECT_GAME;
         exercices.options = options; // O jogo de conectar usa as opções como pares
+        return exercices;
+    }
+
+    public static Exercices createInstruction(Gesture gesture) {
+        Exercices exercices = new Exercices();
+        exercices.type = ActivityDataType.INSTRUCTION;
+        exercices.correctAnswer = gesture;
+        return exercices;
+    }
+
+    public static Exercices createCameraExercise(Gesture gesture) {
+        Exercices exercices = new Exercices();
+        exercices.type = ActivityDataType.CAMERA_EXERCISE;
+        exercices.correctAnswer = gesture;
         return exercices;
     }
 }

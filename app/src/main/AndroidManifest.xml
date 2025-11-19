@@ -40,6 +40,10 @@
             android:theme="@style/Theme.PalmsLibras.NoActionBar" />
 
         <activity android:name=".activities.UnitResultsActivity" />
+        <activity
+            android:name=".activities.CourseActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PalmsLibras.NoActionBar" />
     </application>
 
 </manifest>

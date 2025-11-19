@@ -70,17 +70,28 @@ public class QaFragment extends Fragment implements View.OnClickListener {
 
     private void setupQuestion(View view) {
         TextView tvQuestion = view.findViewById(R.id.tvQuestion);
-        String questionText = getString(R.string.qa_question_template, exercices.getCorrectAnswer().getLetter());
-        tvQuestion.setText(questionText);
+        String letter = exercices.getCorrectAnswer().getLetter();
+        String text = getString(R.string.qa_question_template, letter);
+        android.text.SpannableString sp = new android.text.SpannableString(text);
+        String quoted = "'" + letter + "'";
+        int start = text.indexOf(quoted);
+        if (start >= 0) {
+            int color = requireContext().getResources().getColor(R.color.primary_purple);
+            sp.setSpan(new android.text.style.ForegroundColorSpan(color), start + 1, start + 1 + letter.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        tvQuestion.setText(sp);
     }
 
     private void setupOptions() {
+        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsEnsuringDiversity(optionViews.size());
         for (int i = 0; i < optionViews.size(); i++) {
             View optionContainer = optionViews.get(i);
             ImageView imageView = optionContainer.findViewById(imageViewIds[i]);
 
             Gesture gesture = exercices.getOptions().get(i);
-            imageView.setImageResource(gesture.getDrawableId());
+            int variant = (i < variants.size()) ? variants.get(i) : etec.com.tcc.palmslibras.utils.SkinToneManager.pickVariant();
+            int resId = etec.com.tcc.palmslibras.utils.SkinToneManager.getVariantResId(getContext(), gesture, variant);
+            imageView.setImageResource(resId);
             optionContainer.setTag(gesture);
 
             String contentDesc = getString(R.string.qa_option_image_description, gesture.getLetter());

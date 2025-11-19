@@ -45,6 +45,14 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         MemoryCard card = cardList.get(position);
         holder.bind(card, position);
+        holder.itemView.post(() -> {
+            ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+            int w = holder.itemView.getWidth();
+            if (w > 0 && lp != null) {
+                lp.height = (int) (w * (4f/3f));
+                holder.itemView.setLayoutParams(lp);
+            }
+        });
     }
 
     @Override
@@ -82,7 +90,13 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
             if (card.isImage()) {
                 ivMemoryImage.setVisibility(View.VISIBLE);
                 tvMemoryText.setVisibility(View.GONE);
-                ivMemoryImage.setImageResource(card.getGesture().getDrawableId());
+                int resId;
+                if (card.getVariant() > 0) {
+                    resId = etec.com.tcc.palmslibras.utils.SkinToneManager.getVariantResId(context, card.getGesture(), card.getVariant());
+                } else {
+                    resId = card.getGesture().getDrawableId();
+                }
+                ivMemoryImage.setImageResource(resId);
             } else {
                 tvMemoryText.setVisibility(View.VISIBLE);
                 ivMemoryImage.setVisibility(View.GONE);
@@ -95,7 +109,9 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
             cardBack.setStrokeWidth(0);
 
             // 3. Define a cor de fundo para a parte da frente da carta com base no estado
-            if (card.isMatched()) {
+            if (card.isError()) {
+                cardFront.setCardBackgroundColor(ContextCompat.getColor(context, R.color.choice_incorrect_background));
+            } else if (card.isMatched()) {
                 cardFront.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_matched_color));
             } else if (position == selectedPosition) {
                 cardFront.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_selected_color));
@@ -105,9 +121,23 @@ public class MemoryCardAdapter extends RecyclerView.Adapter<MemoryCardAdapter.Ca
             // Opcional: Para remover a borda padrão do MaterialCardView se houver
             cardFront.setStrokeWidth(0);
 
+            if (!card.isImage()) {
+                if (card.isMatched()) {
+                    tvMemoryText.setTextColor(ContextCompat.getColor(context, R.color.white));
+                } else if (position == selectedPosition) {
+                    tvMemoryText.setTextColor(ContextCompat.getColor(context, R.color.selected_text_gray));
+                } else {
+                    tvMemoryText.setTextColor(ContextCompat.getColor(context, R.color.black));
+                }
+            }
+
             // 4. Define a visibilidade inicial (sem animação, isso é controlado pelo Fragment)
             cardFront.setVisibility(card.isFlipped() ? View.VISIBLE : View.INVISIBLE);
             cardBack.setVisibility(card.isFlipped() ? View.INVISIBLE : View.VISIBLE);
+            cardFront.setRotationY(0f);
+            cardBack.setRotationY(0f);
+            cardFront.setAlpha(card.isFlipped() ? 1f : 0f);
+            cardBack.setAlpha(card.isFlipped() ? 0f : 1f);
         }
     }
 }

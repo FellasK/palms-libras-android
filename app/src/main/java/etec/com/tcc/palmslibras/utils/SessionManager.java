@@ -7,6 +7,8 @@ public class SessionManager {
     private static final String PREF_NAME = "PalmsLibrasSession";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private static final String KEY_USER_ID = "userId";
+    private static final String KEY_UNIT1_COMPLETED = "unit1Completed";
+    private static final String KEY_UNIT2_UNLOCKED = "unit2Unlocked";
 
     private final SharedPreferences pref;
     private final SharedPreferences.Editor editor;
@@ -33,5 +35,23 @@ public class SessionManager {
     public void logoutUser() {
         editor.clear();
         editor.commit();
+    }
+
+    public void setUnit1Completed(boolean completed) {
+        editor.putBoolean(KEY_UNIT1_COMPLETED, completed);
+        editor.commit();
+    }
+
+    public boolean isUnit1Completed() {
+        return pref.getBoolean(KEY_UNIT1_COMPLETED, false);
+    }
+
+    public void setUnit2Unlocked(boolean unlocked) {
+        editor.putBoolean(KEY_UNIT2_UNLOCKED, unlocked);
+        editor.commit();
+    }
+
+    public boolean isUnit2Unlocked() {
+        return pref.getBoolean(KEY_UNIT2_UNLOCKED, false);
     }
 }
