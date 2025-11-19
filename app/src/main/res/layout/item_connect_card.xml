@@ -3,10 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/connectCardView"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_height="72dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardUseCompatPadding="true"
+    app:cardPreventCornerOverlap="true">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -16,7 +18,9 @@
             android:id="@+id/ivConnectCardImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
+            android:scaleType="centerInside"
+            android:adjustViewBounds="true"
+            android:padding="8dp"
             android:visibility="gone" />
 
         <TextView
@@ -24,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             android:visibility="gone" />
     </FrameLayout>

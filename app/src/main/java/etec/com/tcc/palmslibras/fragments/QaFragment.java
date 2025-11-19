@@ -83,7 +83,7 @@ public class QaFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setupOptions() {
-        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsEnsuringDiversity(optionViews.size());
+        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsLimitTwoPerTone(optionViews.size());
         for (int i = 0; i < optionViews.size(); i++) {
             View optionContainer = optionViews.get(i);
             ImageView imageView = optionContainer.findViewById(imageViewIds[i]);

@@ -26,16 +26,20 @@ import etec.com.tcc.palmslibras.models.Exercices; // Mude de Lesson para Exercic
 import etec.com.tcc.palmslibras.models.MemoryCard;
 import etec.com.tcc.palmslibras.utils.OnLessonCompleteListener;
 
-public class ConnectGameFragment extends Fragment implements ConnectCardAdapter.OnCardClickListener {
+public class ConnectGameFragment extends Fragment {
 
     private OnLessonCompleteListener listener;
     private Exercices lessonData; // Mude o tipo da variável de Lesson para Exercices
-    private RecyclerView connectGrid;
-    private ConnectCardAdapter adapter;
+    private RecyclerView leftColumn;
+    private RecyclerView rightColumn;
+    private ConnectCardAdapter leftAdapter;
+    private ConnectCardAdapter rightAdapter;
     private TextView tvPairsCounter;
 
-    private List<MemoryCard> cards = new ArrayList<>();
-    private Integer firstSelectedIndex = null;
+    private List<MemoryCard> leftCards = new ArrayList<>();
+    private List<MemoryCard> rightCards = new ArrayList<>();
+    private Integer selectedLeftIndex = null;
+    private Integer selectedRightIndex = null;
     private int matchedPairs = 0;
     private int totalPairs = 0;
 
@@ -59,7 +63,8 @@ public class ConnectGameFragment extends Fragment implements ConnectCardAdapter.
             lessonData = (Exercices) getArguments().getSerializable("lesson_data");
         }
 
-        connectGrid = view.findViewById(R.id.connectGrid);
+        leftColumn = view.findViewById(R.id.leftColumn);
+        rightColumn = view.findViewById(R.id.rightColumn);
         tvPairsCounter = view.findViewById(R.id.tvPairsCounter);
 
         setupConnectGame();
@@ -77,37 +82,41 @@ public class ConnectGameFragment extends Fragment implements ConnectCardAdapter.
             return;
         }
 
-        // Limpa a lista de cards antes de adicionar novos
-        cards.clear();
+        // Prepara listas de cartas por coluna
 
         // ⭐ CORREÇÃO 2: Iterar sobre a lista correta, que é 'getOptions()'
         List<Gesture> opts = lessonData.getOptions();
+        List<MemoryCard> textCards = new ArrayList<>();
+        List<MemoryCard> imageCards = new ArrayList<>();
         for (int i = 0; i < opts.size(); i++) {
             Gesture g = opts.get(i);
-            MemoryCard imgCard = new MemoryCard(g, true);  // Card com a imagem
-            cards.add(imgCard);
-            cards.add(new MemoryCard(g, false)); // Card com o texto
+            imageCards.add(new MemoryCard(g, true));
+            textCards.add(new MemoryCard(g, false));
         }
-        Collections.shuffle(cards);
+        Collections.shuffle(textCards);
+        Collections.shuffle(imageCards);
 
         // Guarda o número total de pares
         totalPairs = lessonData.getOptions().size();
         // Atribui variantes garantindo diversidade visual
-        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsEnsuringDiversity(totalPairs);
+        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsLimitTwoPerTone(totalPairs);
         int assigned = 0;
-        for (int i = 0; i < cards.size(); i += 2) { // cada par: imagem + texto
-            MemoryCard img = cards.get(i); // imagem
-            if (img.isImage()) {
-                int v = (assigned < variants.size()) ? variants.get(assigned) : etec.com.tcc.palmslibras.utils.SkinToneManager.pickVariant();
-                img.setVariant(v);
-                assigned++;
-            }
+        for (int i = 0; i < imageCards.size(); i++) {
+            MemoryCard c = imageCards.get(i);
+            int v = (assigned < variants.size()) ? variants.get(assigned) : etec.com.tcc.palmslibras.utils.SkinToneManager.pickVariant();
+            c.setVariant(v);
+            assigned++;
         }
 
         // Configura o adapter e o RecyclerView
-        adapter = new ConnectCardAdapter(getContext(), cards, this);
-        connectGrid.setLayoutManager(new GridLayoutManager(getContext(), 4)); // 4 colunas
-        connectGrid.setAdapter(adapter); // Esta linha faz os cards aparecerem
+        leftCards = textCards;
+        rightCards = imageCards;
+        leftAdapter = new ConnectCardAdapter(getContext(), leftCards, position -> onLeftClick(position));
+        rightAdapter = new ConnectCardAdapter(getContext(), rightCards, position -> onRightClick(position));
+        leftColumn.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        rightColumn.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        leftColumn.setAdapter(leftAdapter);
+        rightColumn.setAdapter(rightAdapter);
 
         updatePairsCounter();
     }
@@ -117,33 +126,31 @@ public class ConnectGameFragment extends Fragment implements ConnectCardAdapter.
         tvPairsCounter.setText(getString(R.string.memory_pairs_found_template, matchedPairs, totalPairs));
     }
 
-    @Override
-    public void onCardClick(int position) {
-        if (cards.get(position).isMatched()) {
-            return; // Impede o clique em cards já combinados
-        }
-
-        if (firstSelectedIndex == null) {
-            // Primeiro card selecionado
-            firstSelectedIndex = position;
-            adapter.setSelectedPosition(position);
-            adapter.notifyItemChanged(position);
-        } else {
-            // Segundo card selecionado
-            if (firstSelectedIndex == position) {
-                // Clicou no mesmo card novamente, desmarca ele
-                adapter.setSelectedPosition(RecyclerView.NO_POSITION);
-                adapter.notifyItemChanged(firstSelectedIndex);
-                firstSelectedIndex = null;
-                return;
-            }
-            checkForMatch(firstSelectedIndex, position);
+    private void onLeftClick(int position) {
+        MemoryCard card = leftCards.get(position);
+        if (card.isMatched()) return;
+        selectedLeftIndex = position;
+        leftAdapter.setSelectedPosition(position);
+        leftAdapter.notifyItemChanged(position);
+        if (selectedRightIndex != null) {
+            checkForMatch(selectedLeftIndex, selectedRightIndex);
         }
     }
 
-    private void checkForMatch(int firstPos, int secondPos) {
-        MemoryCard firstCard = cards.get(firstPos);
-        MemoryCard secondCard = cards.get(secondPos);
+    private void onRightClick(int position) {
+        MemoryCard card = rightCards.get(position);
+        if (card.isMatched()) return;
+        selectedRightIndex = position;
+        rightAdapter.setSelectedPosition(position);
+        rightAdapter.notifyItemChanged(position);
+        if (selectedLeftIndex != null) {
+            checkForMatch(selectedLeftIndex, selectedRightIndex);
+        }
+    }
+
+    private void checkForMatch(int leftPos, int rightPos) {
+        MemoryCard firstCard = leftCards.get(leftPos);
+        MemoryCard secondCard = rightCards.get(rightPos);
 
         if (firstCard.getGesture() == secondCard.getGesture() &&
                 firstCard.isImage() != secondCard.isImage()) {
@@ -153,9 +160,8 @@ public class ConnectGameFragment extends Fragment implements ConnectCardAdapter.
             matchedPairs++;
             updatePairsCounter();
 
-            // Notifica as mudanças para atualizar a cor
-            adapter.notifyItemChanged(firstPos);
-            adapter.notifyItemChanged(secondPos);
+            leftAdapter.notifyItemChanged(leftPos);
+            rightAdapter.notifyItemChanged(rightPos);
 
             // Verifica se o jogo terminou
             if (matchedPairs == totalPairs) {
@@ -167,24 +173,28 @@ public class ConnectGameFragment extends Fragment implements ConnectCardAdapter.
             }
 
             // Limpa a seleção para a próxima jogada
-            firstSelectedIndex = null;
-            adapter.setSelectedPosition(RecyclerView.NO_POSITION);
+            selectedLeftIndex = null;
+            selectedRightIndex = null;
+            leftAdapter.setSelectedPosition(RecyclerView.NO_POSITION);
+            rightAdapter.setSelectedPosition(RecyclerView.NO_POSITION);
 
         } else {
             // Par incorreto (Não deu Match)
-            int tempFirstPos = firstSelectedIndex;
-            adapter.setSelectedPosition(RecyclerView.NO_POSITION); // Remove o estado de seleção visualmente
+            firstCard.setError(true);
+            secondCard.setError(true);
+            leftAdapter.notifyItemChanged(leftPos);
+            rightAdapter.notifyItemChanged(rightPos);
 
-            // Notifica a segunda carta para que ela seja redesenhada sem o destaque de seleção
-            adapter.notifyItemChanged(secondPos);
-
-            // Adiciona um pequeno atraso para o jogador ver o erro
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                adapter.notifyItemChanged(tempFirstPos);
-            }, 500);
-
-            // Limpa a seleção para a próxima jogada
-            firstSelectedIndex = null;
+                firstCard.setError(false);
+                secondCard.setError(false);
+                leftAdapter.notifyItemChanged(leftPos);
+                rightAdapter.notifyItemChanged(rightPos);
+                leftAdapter.setSelectedPosition(RecyclerView.NO_POSITION);
+                rightAdapter.setSelectedPosition(RecyclerView.NO_POSITION);
+                selectedLeftIndex = null;
+                selectedRightIndex = null;
+            }, 600);
         }
     }
 }

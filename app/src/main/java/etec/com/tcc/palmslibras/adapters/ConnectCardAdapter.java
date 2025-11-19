@@ -96,18 +96,28 @@ public class ConnectCardAdapter extends RecyclerView.Adapter<ConnectCardAdapter.
             }
 
 
-            // Lógica visual para os estados da carta
+            // Lógica visual para os estados da carta conforme especificação
+            int defaultBg = android.graphics.Color.parseColor("#e0e0e0");
+            int selectedBg = android.graphics.Color.parseColor("#91d7ff");
+            int errorBg = android.graphics.Color.parseColor("#ffa5a5");
+            int matchedBg = android.graphics.Color.parseColor("#b5acff");
+            int defaultText = android.graphics.Color.parseColor("#545454");
+
             if (card.isMatched()) {
-                // Estado: Combinado
-                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.connect_card_matched_bg)); // Cor verde claro
-                cardView.setAlpha(0.7f); // Deixa um pouco transparente
+                cardView.setCardBackgroundColor(matchedBg);
+                if (!card.isImage()) tvCardText.setTextColor(android.graphics.Color.WHITE);
+                cardView.setAlpha(1.0f);
+            } else if (card.isError()) {
+                cardView.setCardBackgroundColor(errorBg);
+                if (!card.isImage()) tvCardText.setTextColor(defaultText);
+                cardView.setAlpha(1.0f);
             } else if (position == selectedPosition) {
-                // Estado: Selecionado
-                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.connect_card_selected_bg)); // Cor azul claro
+                cardView.setCardBackgroundColor(selectedBg);
+                if (!card.isImage()) tvCardText.setTextColor(defaultText);
                 cardView.setAlpha(1.0f);
             } else {
-                // Estado: Padrão
-                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.connect_card_default_bg)); // Cor padrão (branco ou cinza)
+                cardView.setCardBackgroundColor(defaultBg);
+                if (!card.isImage()) tvCardText.setTextColor(defaultText);
                 cardView.setAlpha(1.0f);
             }
         }

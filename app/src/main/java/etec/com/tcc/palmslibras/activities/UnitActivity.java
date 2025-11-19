@@ -107,48 +107,82 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
 
     private void loadUnitLessons() {
         unitNumber = getIntent().getIntExtra("UNIT_NUMBER", 1);
-        List<Gesture> unitGestures = GestureManager.getGesturesForUnit(unitNumber);
-
-        final int CHUNK_SIZE = 4;
+        List<Gesture> novidadesQueue = GestureManager.getGesturesForUnit(unitNumber);
+        List<Gesture> unlockedPool = new ArrayList<>();
         Random random = new Random();
-        for (int start = 0; start < unitGestures.size(); start += CHUNK_SIZE) {
-            int end = Math.min(start + CHUNK_SIZE, unitGestures.size());
-            List<Gesture> chunk = new ArrayList<>(unitGestures.subList(start, end));
 
-            List<Exercices> segment = new ArrayList<>();
-            for (Gesture g : chunk) {
-                List<Gesture> options = GestureManager.getRandomGestures(g, 3);
-                options.add(g);
-                Collections.shuffle(options);
-                segment.add(Exercices.createInstruction(g));
-                segment.add(Exercices.createQaLesson(options, g));
-                segment.add(Exercices.createCameraExercise(g));
+        while (!novidadesQueue.isEmpty()) {
+            Gesture next = novidadesQueue.remove(0);
+            exercicesQueue.add(Exercices.createInstruction(next));
+            unlockedPool.add(next);
+
+            if (unlockedPool.size() >= 4) {
+                int testsToSchedule = 1 + random.nextInt(2);
+                for (int i = 0; i < testsToSchedule; i++) {
+                    addRandomTestUsingPool(unlockedPool, random);
+                }
             }
-
-            boolean includeMemory = random.nextBoolean();
-            boolean includeConnect = random.nextBoolean();
-            if (!includeMemory && !includeConnect) includeMemory = true;
-
-            if (includeMemory && chunk.size() >= 2) {
-                List<Gesture> memorySet = new ArrayList<>(chunk);
-                Collections.shuffle(memorySet);
-                int size = Math.min(4, Math.max(2, memorySet.size()));
-                segment.add(Exercices.createMemoryLesson(memorySet.subList(0, size)));
-            }
-
-            if (includeConnect && chunk.size() >= 2) {
-                List<Gesture> connectSet = new ArrayList<>(chunk);
-                Collections.shuffle(connectSet);
-                int size = Math.min(4, Math.max(2, connectSet.size()));
-                segment.add(Exercices.createConnectLesson(connectSet.subList(0, size)));
-            }
-
-            Collections.shuffle(segment, random);
-            exercicesQueue.addAll(segment);
         }
+
+        int finalTests = Math.min(3, Math.max(1, unlockedPool.size() / 2));
+        for (int i = 0; i < finalTests; i++) addRandomTestUsingPool(unlockedPool, random);
 
         progressBar.setMax(exercicesQueue.size());
         progressBar.setProgress(0);
+    }
+
+    private void addRandomTestUsingPool(List<Gesture> pool, Random random) {
+        if (pool == null || pool.size() < 2) return;
+        List<Exercices.ActivityDataType> candidates = new ArrayList<>();
+        candidates.add(Exercices.ActivityDataType.CAMERA_EXERCISE);
+        if (pool.size() >= 4) {
+            candidates.add(Exercices.ActivityDataType.MEMORY_GAME);
+            candidates.add(Exercices.ActivityDataType.CONNECT_GAME);
+        }
+        if (pool.size() >= 4) {
+            candidates.add(Exercices.ActivityDataType.QUESTION_ANSWER);
+        }
+        Collections.shuffle(candidates, random);
+        Exercices.ActivityDataType type = candidates.get(0);
+
+        switch (type) {
+            case QUESTION_ANSWER: {
+                Gesture correct = pool.get(random.nextInt(pool.size()));
+                List<Gesture> options = new ArrayList<>();
+                options.add(correct);
+                // escolhe 3 distintos do pool
+                List<Gesture> others = new ArrayList<>(pool);
+                others.remove(correct);
+                Collections.shuffle(others, random);
+                int needed = Math.min(3, others.size());
+                options.addAll(others.subList(0, needed));
+                // se por algum motivo não alcançou 4, duplica alguns existentes (mantém regra de só usar pool)
+                while (options.size() < 4 && !others.isEmpty()) {
+                    options.add(others.get(random.nextInt(others.size())));
+                }
+                Collections.shuffle(options, random);
+                exercicesQueue.add(Exercices.createQaLesson(options, correct));
+                break;
+            }
+            case MEMORY_GAME: {
+                List<Gesture> copy = new ArrayList<>(pool);
+                Collections.shuffle(copy, random);
+                exercicesQueue.add(Exercices.createMemoryLesson(copy.subList(0, 4)));
+                break;
+            }
+            case CONNECT_GAME: {
+                List<Gesture> copy = new ArrayList<>(pool);
+                Collections.shuffle(copy, random);
+                exercicesQueue.add(Exercices.createConnectLesson(copy.subList(0, 4)));
+                break;
+            }
+            case CAMERA_EXERCISE:
+            default: {
+                Gesture g = pool.get(random.nextInt(pool.size()));
+                exercicesQueue.add(Exercices.createCameraExercise(g));
+                break;
+            }
+        }
     }
 
     private void loadCurrentLesson() {
@@ -194,6 +228,22 @@ public class UnitActivity extends AppCompatActivity implements OnLessonCompleteL
         if (current.getType() == Exercices.ActivityDataType.INSTRUCTION
                 || current.getType() == Exercices.ActivityDataType.CAMERA_EXERCISE) {
             proceedToNextLesson();
+            return;
+        }
+        if (current.getType() == Exercices.ActivityDataType.MEMORY_GAME) {
+            if (isCorrect) {
+                xpGained += 10;
+                correctAnswers++;
+                showFeedback(true);
+            } else {
+                lives--;
+                updateLivesDisplay();
+                if (lives <= 0) {
+                    Toast.makeText(this, getString(R.string.no_more_lives_toast), Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                return;
+            }
             return;
         }
         if (isCorrect) {

@@ -69,7 +69,7 @@ public class MemoryFragment extends Fragment implements MemoryCardAdapter.OnCard
     }
 
     private void setupMemoryGame() {
-        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsEnsuringDiversity(exercices.getMemoryPairs().size());
+        java.util.List<Integer> variants = etec.com.tcc.palmslibras.utils.SkinToneManager.assignVariantsLimitTwoPerTone(exercices.getMemoryPairs().size());
         int idx = 0;
         for(Gesture g : exercices.getMemoryPairs()){
             MemoryCard img = new MemoryCard(g, true);
